@@ -1,8 +1,18 @@
 # Define clone method
 if [ "$METHOD" = "clone" ]; then
-  REPO=$(echo "${ARGS[1]##*/}" | sed 's/\./-/g')
-  git clone git@gitlab.com:smartarts/${REPO}.git ${ARGS[1]}
-  cd ${ARGS[1]}
+
+  # Set repo based on current dir
+  REPO=$(echo "${PWD##*/}" | sed 's/\./-/g')
+
+  # Clone repo in to current dir
+  git clone git@gitlab.com:smartarts/${REPO}.git .
+
+  # Install node/grunt/bower/composer
   installGrunt
-  echo "Close this window - Open the github app > file > add local repo > select directory"
+
+  # Show complete text
+  echo $HR
+  echo $CLONE
+  echo $HR
+
 fi

@@ -2,15 +2,25 @@
 if [ "$METHOD" = "install" ]; then
 
   # Get config values from PHP
-  DBHOST="$(cat httpdocs/config/config.php | grep -m 1 DBHOST | cut -d \' -f 4)"
-  DBNAME="$(cat httpdocs/config/config.php | grep -m 1 DBNAME | cut -d \' -f 4)"
-  DBUSER="$(cat httpdocs/config/config.php | grep -m 1 DBUSER | cut -d \' -f 4)"
-  DBPASS="$(cat httpdocs/config/config.php | grep -m 1 DBPASS | cut -d \' -f 4)"
+  DBHOST=$( getConfigVar "DBHOST" )
+  DBNAME=$( getConfigVar "DBNAME" )
+  DBUSER=$( getConfigVar "DBUSER" )
+  DBPASS=$( getConfigVar "DBPASS" )
 
-  installGrunt
+  # Load database in to remote server
   mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME < database.sql
+
+  # Install node/grunt/bower/composer
+  installGrunt
+
+  # Perform inital commit
   git add .
   git commit -m 'Install project'
   git push origin master
-  echo "Open the github app > file > add local repo > select directory"
+
+  # Show complete text
+  echo $HR
+  echo $INSTALL
+  echo $HR
+
 fi

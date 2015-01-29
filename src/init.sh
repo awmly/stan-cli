@@ -1,11 +1,22 @@
 # Define init method
 if [ $METHOD = 'init' ]; then
-  mkdir ${ARGS[1]}
-  cd ${ARGS[1]}
+
+  # Download stan archive and extract
   git archive --format=tar --remote=git@gitlab.com:awomersley/stan.git master | tar -xf -
+
+  # Init git repo
   git init
+
+  # Set repo based on directory name and add
   REPO=$(echo "${PWD##*/}" | sed 's/\./-/g')
   git remote add origin git@gitlab.com:smartarts/${REPO}.git
+
+  # Open atom
   atom ./
-  echo "Edit httpdocs/config/config.php and then run 'stan install'"
+
+  # Show complete text
+  echo $HR
+  echo $INIT
+  echo $HR
+
 fi
