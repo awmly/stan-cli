@@ -8,6 +8,29 @@ installGrunt(){
 
 }
 
+# Check if stan is installed
+checkIfDirIsEmpty(){
+
+  if  [ "$(ls -A)" ]; then
+    echo $HR
+    echo $NOTEMPTY
+    echo $HR
+    exit 1
+  fi
+
+}
+
+# Check if stan is installed
+checkIfStanIsInstalled(){
+
+  if [ ! -f "./stan-cli" ]; then
+    echo $HR
+    echo $NOSTAN
+    echo $HR
+    exit 1
+  fi
+
+}
 # Define get config var function
 getConfigVar(){
 

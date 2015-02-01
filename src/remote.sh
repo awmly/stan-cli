@@ -1,5 +1,5 @@
 # Define init-remote method
-if [ "$METHOD" = "init-remote" ]; then
+elif [ "$METHOD" = "remote" ]; then
 
   # Get user and group info
   USER="$(whoami)";
@@ -20,5 +20,3 @@ if [ "$METHOD" = "init-remote" ]; then
   echo $HR
   echo $INITREMOTE
   echo $HR
-
-fi

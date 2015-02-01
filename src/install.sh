@@ -1,5 +1,5 @@
 # Define install method
-if [ "$METHOD" = "install" ]; then
+elif [ "$METHOD" = "install" ]; then
 
   # Get config values from PHP
   DBHOST=$( getConfigVar "DBHOST" )
@@ -9,6 +9,7 @@ if [ "$METHOD" = "install" ]; then
 
   # Load database in to remote server
   mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME < database.sql
+  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
 
   # Install node/grunt/bower/composer
   installGrunt
@@ -18,9 +19,10 @@ if [ "$METHOD" = "install" ]; then
   git commit -m 'Install project'
   git push origin master
 
+  # Upload to server
+  stan upload
+
   # Show complete text
   echo $HR
   echo $INSTALL
   echo $HR
-
-fi

@@ -1,0 +1,86 @@
+#! /bin/sh
+
+######################################
+#### STAN Command Line Interface #####
+########### VERSION 1.0.0 ############
+######## DATE 15:00 - 01/02/15 #######
+######################################
+
+# Get passed arguments
+METHOD="$1";
+ARGS=("$@");
+
+# Set vars
+HR===============================================;
+
+# Set text colours
+GREEN=`tput setaf 2`
+RESET=`tput sgr0`
+
+# Set complete strings
+INIT="${GREEN}✔ INIT COMPLETE ${RESET}\nLocal server now initialised - Edit httpdocs/config/config.php and then run 'stan install'"
+INITREMOTE="${GREEN}✔ INIT REMOTE COMPLETE ${RESET}\nRemote server is now configured - close the window and initialise local server"
+INSTALL="${GREEN}✔ INSTALL COMPLETE ${RESET}\nProject is now installed and set up - run the grunt command to start developing"
+CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}\nProject is now installed and set up - run the grunt command to start developing"
+
+STANEXISTS="STAN is already installed - exiting"
+NOSTAN="STAN is not installed - use grunt commands instead"
+
+# Define install Grunt function
+installGrunt(){
+
+  npm install
+  bower install
+  composer install
+  grunt update
+
+}
+
+# Check if stan is installed
+exitIfStanInstalled(){
+
+  if [ -f "./stan-cli" ]; then
+    echo $STANEXISTS
+    exit 1
+  fi
+
+}
+
+# Check if stan is installed
+exitIfStanNotInstalled(){
+
+  if [ ! -f "./stan-cli" ]; then
+    echo $NOSTAN
+    exit 1
+  fi
+
+}
+
+# Define get config var function
+getConfigVar(){
+
+  VAL="$(cat httpdocs/config/config.php | grep -m 1 $1 | cut -d \' -f 4)"
+  echo $VAL;
+
+}
+
+# Define upload method
+if [ "$METHOD" = "upload" ]; then
+
+  # Set folder permissions
+  find httpdocs/* -type d -print0 | xargs -0 chmod 0755
+  find httpdocs/* -depth -type f \\( ! -path **/less/*.less \\) \\( ! -path **/js/*.js  \\) -print0 | xargs -0 chmod 0644
+  chmod -R 0777 httpdocs/cache
+
+  # Get remote config
+  REMOTE=$( getConfigVar "REMOTE" )
+
+  echo $REMOTE
+
+  # Run rsync command
+  #rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE
+
+  # Upload to CDN
+  #grunt cloudfiles
+
+fi

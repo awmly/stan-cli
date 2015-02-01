@@ -1,5 +1,8 @@
 # Define clone method
-if [ "$METHOD" = "clone" ]; then
+elif [ "$METHOD" = "clone" ]; then
+
+  # Check dir is empty
+  checkIfDirIsEmpty
 
   # Set repo based on current dir
   REPO=$(echo "${PWD##*/}" | sed 's/\./-/g')
@@ -14,5 +17,3 @@ if [ "$METHOD" = "clone" ]; then
   echo $HR
   echo $CLONE
   echo $HR
-
-fi
