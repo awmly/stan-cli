@@ -49,6 +49,16 @@ local:
 	@cat src/functions.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
 	@cat src/upload.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
+	@cat src/sync-db.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
+	@@cat src/speed-test.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
+	@cat src/rebase.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
+	@cat src/default.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
+	@cat src/help.sh >> stan-cli
 
 	@echo "STAN CLI build complete ${DATE} ${TICK}"
 

@@ -1,5 +1,5 @@
 # Define default action
-if [ "$METHOD" = "" ]; then
+elif [ "$METHOD" = "" ]; then
 
   git pull origin master
 
@@ -14,6 +14,4 @@ if [ "$METHOD" = "" ]; then
   open -a 'Google Chrome' http://stan:4000/stan/
   open -a 'Google Chrome' http://stan:4000/
 
-  grunt
-
-fi
+  grunt serve

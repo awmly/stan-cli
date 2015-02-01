@@ -17,5 +17,5 @@ INSTALL="${GREEN}✔ INSTALL COMPLETE ${RESET}\nProject is now installed and set
 CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing"
 
 # Set error strings
-STANEXISTS="${RED}ERROR ${RESET}\nSTAN is already installed - exiting"
-NOSTAN="${RED}ERROR ${RESET}\nSTAN is not installed - use grunt commands instead"
+NOTEMPTY="${RED}ERROR ${RESET}\nDirectory is not empty"
+NOSTAN="${RED}ERROR ${RESET}\nSTAN CLI is not installed - use grunt commands instead"

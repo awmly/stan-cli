@@ -5,7 +5,7 @@ elif [ "$METHOD" = "clone" ]; then
   checkIfDirIsEmpty
 
   # Set repo based on current dir
-  REPO=$(echo "${PWD##*/}" | sed 's/\./-/g')
+  REPO=${PWD##*/}
 
   # Clone repo in to current dir
   git clone git@gitlab.com:smartarts/${REPO}.git .

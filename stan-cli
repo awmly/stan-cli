@@ -3,7 +3,7 @@
 ######################################
 #### STAN Command Line Interface #####
 ########### VERSION 1.0.0 ############
-######## DATE 15:00 - 01/02/15 #######
+######## DATE 17:33 - 01/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -37,20 +37,24 @@ installGrunt(){
 }
 
 # Check if stan is installed
-exitIfStanInstalled(){
+checkIfDirIsEmpty(){
 
-  if [ -f "./stan-cli" ]; then
-    echo $STANEXISTS
+  if  [ "$(ls -A)" ]; then
+    echo $HR
+    echo $NOTEMPTY
+    echo $HR
     exit 1
   fi
 
 }
 
 # Check if stan is installed
-exitIfStanNotInstalled(){
+checkIfStanIsInstalled(){
 
   if [ ! -f "./stan-cli" ]; then
+    echo $HR
     echo $NOSTAN
+    echo $HR
     exit 1
   fi
 
@@ -59,9 +63,14 @@ exitIfStanNotInstalled(){
 # Define get config var function
 getConfigVar(){
 
-  VAL="$(cat httpdocs/config/config.php | grep -m 1 $1 | cut -d \' -f 4)"
-  echo $VAL;
+  #VAL="$(cat httpdocs/config/config.php | grep -m 1 $1 | cut -d \' -f 4)"
+  #VAL=$(php -r "include('httpdocs/config/config.php'); echo REMOTE;")
+  #echo $VAL;
+  php -r "include('httpdocs/config/config.php'); echo ${1};"
+}
 
+syncDatabase(){
+  php -r "include('httpdocs/config/config.php'); echo REMOTE;"
 }
 
 # Define upload method
@@ -69,18 +78,69 @@ if [ "$METHOD" = "upload" ]; then
 
   # Set folder permissions
   find httpdocs/* -type d -print0 | xargs -0 chmod 0755
-  find httpdocs/* -depth -type f \\( ! -path **/less/*.less \\) \\( ! -path **/js/*.js  \\) -print0 | xargs -0 chmod 0644
+  find httpdocs/* -type f -print0 | xargs -0 chmod 0644
   chmod -R 0777 httpdocs/cache
 
   # Get remote config
-  REMOTE=$( getConfigVar "REMOTE" )
-
-  echo $REMOTE
+  REMOTE_PATH=$( getConfigVar "REMOTE_PATH" )
 
   # Run rsync command
-  #rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE
+  # rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE_PATH
 
   # Upload to CDN
-  #grunt cloudfiles
+  grunt cloudfiles
+
+# Define syncdb method
+elif [ "$METHOD" = "syncdb" ]; then
+
+  #mysql -u stan -pstan stan --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
+  #wget 'http://backup.sadev4.co.uk/dump.php?n=&key=6gb-S4m-dRaY-v7sT' -O database.sql
+  #mysql -u stan -pstan stan < database.sql
+
+  DBHOST=$( getConfigVar "DBHOST" )
+
+  echo 12;
+  echo $DBHOST;
+
+  #syncDatabase
+
+# Define speed test method
+elif [ "$METHOD" = "speedtest" ]; then
+
+  "php tests/sitespeed.io/set-url.php",
+  "source tests/sitespeed.io/url && sitespeed.io -u $URL -r tests/sitespeed.io/ -j 20 -s /contact-us",
+  "php tests/gtmetrix/run-test.php",
+
+# Define rebase method
+elif [ "$METHOD" = "rebase" ]; then
+
+  git stash
+
+  git pull --rebase -p origin master
+
+  git stash apply
+
+# Define default action
+elif [ "$METHOD" = "" ]; then
+
+  git pull origin master
+
+  grunt update
+
+  atom ./
+
+  mysql.server start
+
+  syncDB
+
+  open -a 'Google Chrome' http://stan:4000/stan/
+  open -a 'Google Chrome' http://stan:4000/
+
+  grunt serve
+
+# Define sync-db method
+else
+
+  echo "HELP"
 
 fi

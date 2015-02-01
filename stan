@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 16:22 - 01/02/15 #######
+######## DATE 16:31 - 01/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -26,8 +26,8 @@ INSTALL="${GREEN}✔ INSTALL COMPLETE ${RESET}\nProject is now installed and set
 CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing"
 
 # Set error strings
-STANEXISTS="${RED}ERROR ${RESET}\nSTAN is already installed - exiting"
-NOSTAN="${RED}ERROR ${RESET}\nSTAN is not installed - use grunt commands instead"
+NOTEMPTY="${RED}ERROR ${RESET}\nDirectory is not empty"
+NOSTAN="${RED}ERROR ${RESET}\nSTAN CLI is not installed - use grunt commands instead"
 
 # Define install Grunt function
 installGrunt(){
@@ -182,3 +182,14 @@ else
   ./stan-cli $@
 
 fi
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############
+############# LOCAL BIN ##############

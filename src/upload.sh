@@ -14,5 +14,3 @@ if [ "$METHOD" = "upload" ]; then
 
   # Upload to CDN
   grunt cloudfiles
-
-fi
