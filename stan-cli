@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 10:31 - 03/02/15 #######
+######## DATE 19:05 - 03/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -21,9 +21,12 @@ RESET=`tput sgr0`
 
 # Set complete strings
 UPLOAD="${GREEN}✔ UPLOAD COMPLETE ${RESET}"
-SYNCREMOTE="${GREEN}✔ LOCAL DATABASE SYNCED TO REMOTE ${RESET}"
-SYNCLOCAL="${GREEN}✔ REMOTE DATABASE SYNCED TO LOCAL ${RESET}"
 REBASE="${GREEN}✔ REBASE COMPLETE ${RESET}"
+IMPORTREMOTE="${GREEN}✔ DATABASE IMPORTED TO REMOTE ${RESET}"
+IMPORTLOCAL="${GREEN}✔ DATABASE IMPORTED TO LOCAL ${RESET}"
+EXPORTREMOTE="${GREEN}✔ REMOTE DATABASE EXPORTED ${RESET}"
+EXPORTLOCAL="${GREEN}✔ LOCAL DATABASE EXPORTED ${RESET}"
+DBCONF="${GREEN}✔ DATABASE CONFIG FILES CREATED ${RESET}"
 
 # Define install Grunt function
 installGrunt(){
@@ -76,22 +79,22 @@ getConfigVar(){
 # Define get remote database function
 exportRemoteDatabase(){
 
-  # Get config values from PHP
-  DBHOST=$( getConfigVar "DBHOST" )
+  # Get database name
   DBNAME=$( getConfigVar "DBNAME" )
-  DBUSER=$( getConfigVar "DBUSER" )
-  DBPASS=$( getConfigVar "DBPASS" )
 
   # Run mysqldump command
-  mysqldump --complete-insert --default-character-set=utf8 --host=${DBHOST} --user=${DBUSER} --password=${DBPASS} $DBNAME > database.sql
+  mysqldump --defaults-extra-file=database/remote.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
 }
 
 # Define get remote database function
 exportLocalDatabase(){
 
+  # Get database name
+  DBNAME=$( getConfigVar "DBNAME_LOCAL" )
+
   # Run mysqldump command
-  mysqldump --complete-insert --default-character-set=utf8 --user=stan --password=stan stan > database.sql
+  mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
 }
 
@@ -99,28 +102,22 @@ exportLocalDatabase(){
 # Define get remote database function
 importRemoteDatabase(){
 
-  # Get config values from PHP
-  DBHOST=$( getConfigVar "DBHOST" )
+  # Get database name
   DBNAME=$( getConfigVar "DBNAME" )
-  DBUSER=$( getConfigVar "DBUSER" )
-  DBPASS=$( getConfigVar "DBPASS" )
-
-  # Drop all current tables
-  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
 
   # Load database
-  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME < database.sql
+  mysql --defaults-extra-file=database/remote.cnf $DBNAME < database/database.sql
 }
 
 
 # Define get remote database function
 importLocalDatabase(){
 
-  # Drop all current tables
-  mysql -u stan -pstan stan --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
+  # Get database name
+  DBNAME=$( getConfigVar "DBNAME_LOCAL" )
 
   # Load database
-  mysql -u stan -pstan stan < database.sql
+  mysql --defaults-extra-file=database/local.cnf $DBNAME < database/database.sql
 
 }
 
@@ -136,7 +133,7 @@ if [ "$METHOD" = "upload" ]; then
   REMOTE=$( getConfigVar "REMOTE" )
 
   # Run rsync command
-  rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE_PATH
+  rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE
 
   # Upload to CDN
   grunt cloudfiles
@@ -147,32 +144,91 @@ if [ "$METHOD" = "upload" ]; then
   echo $HR
 
 # Define syncdb method
-elif [ "$METHOD" = "syncdb" ]; then
+elif [ "$METHOD" = "db" ]; then
 
-  if [ "${ARGS[1]}" = "remotetolocal" ]; then
+  if [ "${ARGS[1]}" = "conf" ]; then
 
-    # Export the remote database
-    exportRemoteDatabase
+    # Get remote db variables from config
+    DBHOST=$( getConfigVar "DBHOST" )
+    DBUSER=$( getConfigVar "DBUSER" )
+    DBPASS=$( getConfigVar "DBPASS" )
 
-    # Load the database in to local mysql server
-    importLocalDatabase
+    # Create mysql cnf file
+    echo "[client]" > database/remote.cnf
+    echo "host = ${DBHOST}" >> database/remote.cnf
+    echo "user = ${DBUSER}" >> database/remote.cnf
+    echo "password = ${DBPASS}" >> database/remote.cnf
+
+    # Get local db variables from config
+    DBHOST=$( getConfigVar "DBHOST_LOCAL" )
+    DBUSER=$( getConfigVar "DBUSER_LOCAL" )
+    DBPASS=$( getConfigVar "DBPASS_LOCAL" )
+
+    # Create mysql cnf file
+    echo "[client]" > database/local.cnf
+    echo "host = ${DBHOST}" >> database/local.cnf
+    echo "user = ${DBUSER}" >> database/local.cnf
+    echo "password = ${DBPASS}" >> database/local.cnf
 
     # Show complete text
     echo $HR
-    echo $LOCAL
+    echo $DBCONF
     echo $HR
+
+  elif [ "${ARGS[1]}" = "remotetolocal" ]; then
+
+    # Export the remote database
+    stan db exportremote
+
+    # Load the database in to local mysql server
+    stan db importlocal
 
   elif [ "${ARGS[1]}" = "localtoremote" ]; then
 
     # Export the local database
-    exportLocalDatabase
+    stan db exportlocal
 
     # Load the database in to remote mysql server
+    stan db importremote
+
+  elif [ "${ARGS[1]}" = "exportremote" ]; then
+
+    # Export the local database
+    exportRemoteDatabase
+
+    # Show complete text
+    echo $HR
+    echo $EXPORTREMOTE
+    echo $HR
+
+  elif [ "${ARGS[1]}" = "exportlocal" ]; then
+
+    # Export the local database
+    exportLocalDatabase
+
+    # Show complete text
+    echo $HR
+    echo $EXPORTLOCAL
+    echo $HR
+
+  elif [ "${ARGS[1]}" = "importremote" ]; then
+
+    # Export the local database
     importRemoteDatabase
 
     # Show complete text
     echo $HR
-    echo $REMOTE
+    echo $IMPORTREMOTE
+    echo $HR
+
+  elif [ "${ARGS[1]}" = "importlocal" ]; then
+
+    # Export the local database
+    importLocalDatabase
+
+    # Show complete text
+    echo $HR
+    echo $IMPORTLOCAL
     echo $HR
 
   fi

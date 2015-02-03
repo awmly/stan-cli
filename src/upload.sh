@@ -10,7 +10,7 @@ if [ "$METHOD" = "upload" ]; then
   REMOTE=$( getConfigVar "REMOTE" )
 
   # Run rsync command
-  rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE_PATH
+  rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE
 
   # Upload to CDN
   grunt cloudfiles

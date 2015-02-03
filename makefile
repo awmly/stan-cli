@@ -52,7 +52,7 @@ local:
 	@echo "${NL}" >> stan-cli
 	@cat src/upload.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
-	@cat src/sync-db.sh >> stan-cli
+	@cat src/database.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
 	@@cat src/speed-test.sh >> stan-cli
 	@echo "${NL}" >> stan-cli

@@ -9,7 +9,7 @@ elif [ "$METHOD" = "update" ]; then
 
   else
 
-    wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan-cli
+    wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan-cli -O ./stan-cli
     chmod +x stan-cli
 
   fi

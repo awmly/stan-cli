@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 10:32 - 03/02/15 #######
+######## DATE 19:05 - 03/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -80,22 +80,22 @@ getConfigVar(){
 # Define get remote database function
 exportRemoteDatabase(){
 
-  # Get config values from PHP
-  DBHOST=$( getConfigVar "DBHOST" )
+  # Get database name
   DBNAME=$( getConfigVar "DBNAME" )
-  DBUSER=$( getConfigVar "DBUSER" )
-  DBPASS=$( getConfigVar "DBPASS" )
 
   # Run mysqldump command
-  mysqldump --complete-insert --default-character-set=utf8 --host=${DBHOST} --user=${DBUSER} --password=${DBPASS} $DBNAME > database.sql
+  mysqldump --defaults-extra-file=database/remote.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
 }
 
 # Define get remote database function
 exportLocalDatabase(){
 
+  # Get database name
+  DBNAME=$( getConfigVar "DBNAME_LOCAL" )
+
   # Run mysqldump command
-  mysqldump --complete-insert --default-character-set=utf8 --user=stan --password=stan stan > database.sql
+  mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
 }
 
@@ -103,28 +103,22 @@ exportLocalDatabase(){
 # Define get remote database function
 importRemoteDatabase(){
 
-  # Get config values from PHP
-  DBHOST=$( getConfigVar "DBHOST" )
+  # Get database name
   DBNAME=$( getConfigVar "DBNAME" )
-  DBUSER=$( getConfigVar "DBUSER" )
-  DBPASS=$( getConfigVar "DBPASS" )
-
-  # Drop all current tables
-  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
 
   # Load database
-  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME < database.sql
+  mysql --defaults-extra-file=database/remote.cnf $DBNAME < database/database.sql
 }
 
 
 # Define get remote database function
 importLocalDatabase(){
 
-  # Drop all current tables
-  mysql -u stan -pstan stan --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
+  # Get database name
+  DBNAME=$( getConfigVar "DBNAME_LOCAL" )
 
   # Load database
-  mysql -u stan -pstan stan < database.sql
+  mysql --defaults-extra-file=database/local.cnf $DBNAME < database/database.sql
 
 }
 
@@ -155,17 +149,17 @@ if [ "$METHOD" = "init" ]; then
 # Define install method
 elif [ "$METHOD" = "install" ]; then
 
+  # Create mysql config files
+  stan db conf
+
   # Load database in to remote server
   importRemoteDatabase
 
   # Get config values from PHP
-  DBHOST=$( getConfigVar "DBHOST" )
   DBNAME=$( getConfigVar "DBNAME" )
-  DBUSER=$( getConfigVar "DBUSER" )
-  DBPASS=$( getConfigVar "DBPASS" )
 
   # Truncate uploads and satmp tables
-  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
+  mysql --defaults-extra-file=database/remote.cnf $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
 
   # Install node/grunt/bower/composer
   installGrunt
@@ -237,7 +231,7 @@ elif [ "$METHOD" = "update" ]; then
 
   else
 
-    wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan-cli
+    wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan-cli -O ./stan-cli
     chmod +x stan-cli
 
   fi
