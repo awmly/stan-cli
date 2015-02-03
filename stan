@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 16:31 - 01/02/15 #######
+######## DATE 10:32 - 03/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -39,9 +39,11 @@ installGrunt(){
 
 }
 
-# Check if stan is installed
+
+# Define check if dir is empty function
 checkIfDirIsEmpty(){
 
+  # Check if dir is empty
   if  [ "$(ls -A)" ]; then
     echo $HR
     echo $NOTEMPTY
@@ -51,9 +53,11 @@ checkIfDirIsEmpty(){
 
 }
 
-# Check if stan is installed
+
+# Define check if stan is installed function
 checkIfStanIsInstalled(){
 
+  # Check if stan-cli file exists
   if [ ! -f "./stan-cli" ]; then
     echo $HR
     echo $NOSTAN
@@ -62,16 +66,70 @@ checkIfStanIsInstalled(){
   fi
 
 }
+
+
 # Define get config var function
 getConfigVar(){
 
-  VAL="$(cat httpdocs/config/config.php | grep -m 1 $1 | cut -d \' -f 4)"
-  echo $VAL;
+  # Include config file and echo out variable
+  php -r "include('httpdocs/config/config.php'); echo ${1};"
+
+}
+
+
+# Define get remote database function
+exportRemoteDatabase(){
+
+  # Get config values from PHP
+  DBHOST=$( getConfigVar "DBHOST" )
+  DBNAME=$( getConfigVar "DBNAME" )
+  DBUSER=$( getConfigVar "DBUSER" )
+  DBPASS=$( getConfigVar "DBPASS" )
+
+  # Run mysqldump command
+  mysqldump --complete-insert --default-character-set=utf8 --host=${DBHOST} --user=${DBUSER} --password=${DBPASS} $DBNAME > database.sql
+
+}
+
+# Define get remote database function
+exportLocalDatabase(){
+
+  # Run mysqldump command
+  mysqldump --complete-insert --default-character-set=utf8 --user=stan --password=stan stan > database.sql
+
+}
+
+
+# Define get remote database function
+importRemoteDatabase(){
+
+  # Get config values from PHP
+  DBHOST=$( getConfigVar "DBHOST" )
+  DBNAME=$( getConfigVar "DBNAME" )
+  DBUSER=$( getConfigVar "DBUSER" )
+  DBPASS=$( getConfigVar "DBPASS" )
+
+  # Drop all current tables
+  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
+
+  # Load database
+  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME < database.sql
+}
+
+
+# Define get remote database function
+importLocalDatabase(){
+
+  # Drop all current tables
+  mysql -u stan -pstan stan --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
+
+  # Load database
+  mysql -u stan -pstan stan < database.sql
 
 }
 
 # Define init method
-if [ $METHOD = 'init' ]; then
+if [ "$METHOD" = "init" ]; then
 
   # Check dir is empty
   checkIfDirIsEmpty
@@ -97,14 +155,16 @@ if [ $METHOD = 'init' ]; then
 # Define install method
 elif [ "$METHOD" = "install" ]; then
 
+  # Load database in to remote server
+  importRemoteDatabase
+
   # Get config values from PHP
   DBHOST=$( getConfigVar "DBHOST" )
   DBNAME=$( getConfigVar "DBNAME" )
   DBUSER=$( getConfigVar "DBUSER" )
   DBPASS=$( getConfigVar "DBPASS" )
 
-  # Load database in to remote server
-  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME < database.sql
+  # Truncate uploads and satmp tables
   mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
 
   # Install node/grunt/bower/composer
@@ -153,7 +213,7 @@ elif [ "$METHOD" = "clone" ]; then
   checkIfDirIsEmpty
 
   # Set repo based on current dir
-  REPO=$(echo "${PWD##*/}" | sed 's/\./-/g')
+  REPO=${PWD##*/}
 
   # Clone repo in to current dir
   git clone git@gitlab.com:smartarts/${REPO}.git .
@@ -169,9 +229,18 @@ elif [ "$METHOD" = "clone" ]; then
 # Define update method
 elif [ "$METHOD" = "update" ]; then
 
-  wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan
-  chmod +x stan
-  mv stan /usr/bin
+  if [ "${ARGS[1]}" = "global" ]; then
+
+    wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan
+    chmod +x stan
+    mv stan /usr/bin
+
+  else
+
+    wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan-cli
+    chmod +x stan-cli
+
+  fi
 
 else
 
@@ -182,14 +251,3 @@ else
   ./stan-cli $@
 
 fi
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############
-############# LOCAL BIN ##############

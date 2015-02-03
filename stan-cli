@@ -2,8 +2,9 @@
 
 ######################################
 #### STAN Command Line Interface #####
+############# LOCAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 17:33 - 01/02/15 #######
+######## DATE 10:31 - 03/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -15,16 +16,14 @@ HR===============================================;
 
 # Set text colours
 GREEN=`tput setaf 2`
+RED=`tput setaf 1`
 RESET=`tput sgr0`
 
 # Set complete strings
-INIT="${GREEN}✔ INIT COMPLETE ${RESET}\nLocal server now initialised - Edit httpdocs/config/config.php and then run 'stan install'"
-INITREMOTE="${GREEN}✔ INIT REMOTE COMPLETE ${RESET}\nRemote server is now configured - close the window and initialise local server"
-INSTALL="${GREEN}✔ INSTALL COMPLETE ${RESET}\nProject is now installed and set up - run the grunt command to start developing"
-CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}\nProject is now installed and set up - run the grunt command to start developing"
-
-STANEXISTS="STAN is already installed - exiting"
-NOSTAN="STAN is not installed - use grunt commands instead"
+UPLOAD="${GREEN}✔ UPLOAD COMPLETE ${RESET}"
+SYNCREMOTE="${GREEN}✔ LOCAL DATABASE SYNCED TO REMOTE ${RESET}"
+SYNCLOCAL="${GREEN}✔ REMOTE DATABASE SYNCED TO LOCAL ${RESET}"
+REBASE="${GREEN}✔ REBASE COMPLETE ${RESET}"
 
 # Define install Grunt function
 installGrunt(){
@@ -36,9 +35,11 @@ installGrunt(){
 
 }
 
-# Check if stan is installed
+
+# Define check if dir is empty function
 checkIfDirIsEmpty(){
 
+  # Check if dir is empty
   if  [ "$(ls -A)" ]; then
     echo $HR
     echo $NOTEMPTY
@@ -48,9 +49,11 @@ checkIfDirIsEmpty(){
 
 }
 
-# Check if stan is installed
+
+# Define check if stan is installed function
 checkIfStanIsInstalled(){
 
+  # Check if stan-cli file exists
   if [ ! -f "./stan-cli" ]; then
     echo $HR
     echo $NOSTAN
@@ -60,17 +63,65 @@ checkIfStanIsInstalled(){
 
 }
 
+
 # Define get config var function
 getConfigVar(){
 
-  #VAL="$(cat httpdocs/config/config.php | grep -m 1 $1 | cut -d \' -f 4)"
-  #VAL=$(php -r "include('httpdocs/config/config.php'); echo REMOTE;")
-  #echo $VAL;
+  # Include config file and echo out variable
   php -r "include('httpdocs/config/config.php'); echo ${1};"
+
 }
 
-syncDatabase(){
-  php -r "include('httpdocs/config/config.php'); echo REMOTE;"
+
+# Define get remote database function
+exportRemoteDatabase(){
+
+  # Get config values from PHP
+  DBHOST=$( getConfigVar "DBHOST" )
+  DBNAME=$( getConfigVar "DBNAME" )
+  DBUSER=$( getConfigVar "DBUSER" )
+  DBPASS=$( getConfigVar "DBPASS" )
+
+  # Run mysqldump command
+  mysqldump --complete-insert --default-character-set=utf8 --host=${DBHOST} --user=${DBUSER} --password=${DBPASS} $DBNAME > database.sql
+
+}
+
+# Define get remote database function
+exportLocalDatabase(){
+
+  # Run mysqldump command
+  mysqldump --complete-insert --default-character-set=utf8 --user=stan --password=stan stan > database.sql
+
+}
+
+
+# Define get remote database function
+importRemoteDatabase(){
+
+  # Get config values from PHP
+  DBHOST=$( getConfigVar "DBHOST" )
+  DBNAME=$( getConfigVar "DBNAME" )
+  DBUSER=$( getConfigVar "DBUSER" )
+  DBPASS=$( getConfigVar "DBPASS" )
+
+  # Drop all current tables
+  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
+
+  # Load database
+  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME < database.sql
+}
+
+
+# Define get remote database function
+importLocalDatabase(){
+
+  # Drop all current tables
+  mysql -u stan -pstan stan --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
+
+  # Load database
+  mysql -u stan -pstan stan < database.sql
+
 }
 
 # Define upload method
@@ -82,63 +133,128 @@ if [ "$METHOD" = "upload" ]; then
   chmod -R 0777 httpdocs/cache
 
   # Get remote config
-  REMOTE_PATH=$( getConfigVar "REMOTE_PATH" )
+  REMOTE=$( getConfigVar "REMOTE" )
 
   # Run rsync command
-  # rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE_PATH
+  rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE_PATH
 
   # Upload to CDN
   grunt cloudfiles
 
+  # Show complete text
+  echo $HR
+  echo $UPLOAD
+  echo $HR
+
 # Define syncdb method
 elif [ "$METHOD" = "syncdb" ]; then
 
-  #mysql -u stan -pstan stan --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
-  #wget 'http://backup.sadev4.co.uk/dump.php?n=&key=6gb-S4m-dRaY-v7sT' -O database.sql
-  #mysql -u stan -pstan stan < database.sql
+  if [ "${ARGS[1]}" = "remotetolocal" ]; then
 
-  DBHOST=$( getConfigVar "DBHOST" )
+    # Export the remote database
+    exportRemoteDatabase
 
-  echo 12;
-  echo $DBHOST;
+    # Load the database in to local mysql server
+    importLocalDatabase
 
-  #syncDatabase
+    # Show complete text
+    echo $HR
+    echo $LOCAL
+    echo $HR
+
+  elif [ "${ARGS[1]}" = "localtoremote" ]; then
+
+    # Export the local database
+    exportLocalDatabase
+
+    # Load the database in to remote mysql server
+    importRemoteDatabase
+
+    # Show complete text
+    echo $HR
+    echo $REMOTE
+    echo $HR
+
+  fi
 
 # Define speed test method
 elif [ "$METHOD" = "speedtest" ]; then
 
-  "php tests/sitespeed.io/set-url.php",
-  "source tests/sitespeed.io/url && sitespeed.io -u $URL -r tests/sitespeed.io/ -j 20 -s /contact-us",
-  "php tests/gtmetrix/run-test.php",
+  # Get SIET_URL from config file
+  SITE_URL=$( getConfigVar "SITE_URL" )
+
+  # Run sitespeed.io test
+  sitespeed.io -u $SITE_URL -r tests/sitespeed.io/ -j 20 -s /contact-us
+
+  # Run GT Metrix (Page speed and Y Slow)
+  php tests/gtmetrix/run-test.php
 
 # Define rebase method
 elif [ "$METHOD" = "rebase" ]; then
 
-  git stash
+  # Get current git status
+  GIT_STATUS=$( git status )
 
-  git pull --rebase -p origin master
+  # Check if there are any unstaged files
+  if [[ $GIT_STATUS == *"nothing to commit"* ]]; then
 
-  git stash apply
+    # Rebase master
+    git pull --rebase -p origin master
+
+  else
+
+    # Stash any un-commited files
+    git stash
+
+    # Rebase master
+    git pull --rebase -p origin master
+
+    # Unstash files
+    git stash apply
+
+  fi
+
+  # Show complete text
+  echo $HR
+  echo $REBASE
+  echo $HR
 
 # Define default action
 elif [ "$METHOD" = "" ]; then
 
-  git pull origin master
+  # Rebase from rmeote
+  stan rebase
 
+  # Update libs
   grunt update
 
+  # Open atom
   atom ./
 
+  # Start mysql server
   mysql.server start
 
-  syncDB
+  # Get sync db value from config
+  SYNC_DB=$( getConfigVar "SYNC_DB" )
 
+  # If sync db is on then download remote database
+  if [ "$SYNC_DB" = "1" ]; then
+
+    exportRemoteDatabase
+
+  fi
+
+  # Import database.sql file in to local mysql server
+  importLocalDatabase
+
+  # Open frontend and backend in Chrome
   open -a 'Google Chrome' http://stan:4000/stan/
   open -a 'Google Chrome' http://stan:4000/
 
+  # Start grunt server
   grunt serve
 
-# Define sync-db method
+# Define help method
 else
 
   echo "HELP"

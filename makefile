@@ -4,6 +4,7 @@ TICK=\033[32m✔\033[39m
 DATE=$(shell date +"%H:%M - %d/%m/%y")
 $NL="\r"
 
+
 # Build STAN CLI From Source
 global:
 	@echo "#! /bin/sh" > stan
@@ -33,13 +34,14 @@ global:
 
 	@echo "STAN CLI build complete ${DATE} ${TICK}"
 
+
 # Build STAN CLI From Source
 local:
 	@echo "#! /bin/sh" > stan-cli
 	@echo "${NL}" >> stan-cli
 	@echo "######################################" >> stan-cli
 	@echo "#### STAN Command Line Interface #####" >> stan-cli
-	@echo "############# LOCAL BIN ##############" >> stan
+	@echo "############# LOCAL BIN ##############" >> stan-cli
 	@echo "########### VERSION ${VERSION} ############" >> stan-cli
 	@echo "######## DATE ${DATE} #######" >> stan-cli
 	@echo "######################################" >> stan-cli

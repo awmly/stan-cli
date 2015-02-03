@@ -46,17 +46,51 @@ getConfigVar(){
 }
 
 
-# Define sync database function
-syncDatabase(){
+# Define get remote database function
+exportRemoteDatabase(){
 
-  # Get SITE_URL from config
-  SITE_URL=$( getConfigVar "SITE_URL" )
+  # Get config values from PHP
+  DBHOST=$( getConfigVar "DBHOST" )
+  DBNAME=$( getConfigVar "DBNAME" )
+  DBUSER=$( getConfigVar "DBUSER" )
+  DBPASS=$( getConfigVar "DBPASS" )
+
+  # Run mysqldump command
+  mysqldump --complete-insert --default-character-set=utf8 --host=${DBHOST} --user=${DBUSER} --password=${DBPASS} $DBNAME > database.sql
+
+}
+
+# Define get remote database function
+exportLocalDatabase(){
+
+  # Run mysqldump command
+  mysqldump --complete-insert --default-character-set=utf8 --user=stan --password=stan stan > database.sql
+
+}
+
+
+# Define get remote database function
+importRemoteDatabase(){
+
+  # Get config values from PHP
+  DBHOST=$( getConfigVar "DBHOST" )
+  DBNAME=$( getConfigVar "DBNAME" )
+  DBUSER=$( getConfigVar "DBUSER" )
+  DBPASS=$( getConfigVar "DBPASS" )
+
+  # Drop all current tables
+  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
+
+  # Load database
+  mysql -h $DBHOST -u $DBUSER -p${DBPASS} $DBNAME < database.sql
+}
+
+
+# Define get remote database function
+importLocalDatabase(){
 
   # Drop all current tables
   mysql -u stan -pstan stan --execute='DROP TABLE IF EXISTS json, saconfig, saconfiggrp, saconfigparam, saextra, saextradata, saextramap, saextramodule, satmp, uploads'
-
-  # Download DB from remote server
-  wget ${SITE_URL}/scripts/export/database -O database.sql
 
   # Load database
   mysql -u stan -pstan stan < database.sql

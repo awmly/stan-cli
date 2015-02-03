@@ -7,10 +7,15 @@ if [ "$METHOD" = "upload" ]; then
   chmod -R 0777 httpdocs/cache
 
   # Get remote config
-  REMOTE_PATH=$( getConfigVar "REMOTE_PATH" )
+  REMOTE=$( getConfigVar "REMOTE" )
 
   # Run rsync command
   rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE_PATH
 
   # Upload to CDN
   grunt cloudfiles
+
+  # Show complete text
+  echo $HR
+  echo $UPLOAD
+  echo $HR

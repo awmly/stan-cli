@@ -1,4 +1,4 @@
-# Define sync-db method
+# Define help method
 else
 
   echo "HELP"

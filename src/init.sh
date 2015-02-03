@@ -1,5 +1,5 @@
 # Define init method
-if [ $METHOD = 'init' ]; then
+if [ "$METHOD" = "init" ]; then
 
   # Check dir is empty
   checkIfDirIsEmpty
