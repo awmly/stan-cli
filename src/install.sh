@@ -4,14 +4,14 @@ elif [ "$METHOD" = "install" ]; then
   # Create mysql config files
   stan db conf
 
-  # Load database in to local server
-  stan db importlocal
+  # Load database in to staging server
+  stan db importstaging
 
   # Get config values from PHP
-  DBNAME=$( getConfigVar "DBNAME" )
+  DBNAME=$( getConfigVar "DBNAME_STAGING" )
 
   # Truncate uploads and satmp tables
-  mysql --defaults-extra-file=database/remote.cnf $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
+  mysql --defaults-extra-file=database/staging.cnf $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
 
   # Install node/grunt/bower/composer
   installGrunt

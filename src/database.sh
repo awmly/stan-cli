@@ -39,7 +39,7 @@ elif [ "$METHOD" = "db" ]; then
     # Show complete text
     echo $DBCONF
 
-  if [ "${ARGS[1]}" = "exportproduction" ]; then
+  elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
     # Get database name
     DBNAME=$( getConfigVar "DBNAME" )

@@ -58,6 +58,8 @@ local:
 	@echo "${NL}" >> stan-cli
 	@cat src/rebase.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
+	@cat src/optimise.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
 	@cat src/default.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
 	@cat src/help.sh >> stan-cli

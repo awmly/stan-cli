@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 12:10 - 04/02/15 #######
+######## DATE 15:25 - 04/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -141,7 +141,7 @@ elif [ "$METHOD" = "db" ]; then
     # Show complete text
     echo $DBCONF
 
-  if [ "${ARGS[1]}" = "exportproduction" ]; then
+  elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
     # Get database name
     DBNAME=$( getConfigVar "DBNAME" )
@@ -252,6 +252,12 @@ elif [ "$METHOD" = "rebase" ]; then
 
   # Show complete text
   echo $REBASE
+
+# Define optimise method
+elif [ "$METHOD" = "optimise" ]; then
+
+  jpegoptim httpdocs/assets/frontend/images/*.jpg
+  optipng -o5 httpdocs/assets/frontend/images/*.png
 
 # Define default action
 elif [ "$METHOD" = "" ]; then
