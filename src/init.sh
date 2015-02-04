@@ -18,6 +18,4 @@ if [ "$METHOD" = "init" ]; then
   atom ./
 
   # Show complete text
-  echo $HR
   echo $INIT
-  echo $HR

@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 19:05 - 03/02/15 #######
+######## DATE 19:58 - 03/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -43,8 +43,8 @@ installGrunt(){
 # Define check if dir is empty function
 checkIfDirIsEmpty(){
 
-  # Check if dir is empty
-  if  [ "$(ls -A)" ]; then
+  # Check if dir is empty - except for git folder auto created by github app
+  if  [ "$(ls -A | grep -v .git)" ]; then
     echo $HR
     echo $NOTEMPTY
     echo $HR

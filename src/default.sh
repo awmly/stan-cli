@@ -1,7 +1,7 @@
 # Define default action
 elif [ "$METHOD" = "" ]; then
 
-  # Rebase from rmeote
+  # Rebase from remote
   stan rebase
 
   # Update libs
@@ -13,18 +13,9 @@ elif [ "$METHOD" = "" ]; then
   # Start mysql server
   mysql.server start
 
-  # Get sync db value from config
-  SYNC_DB=$( getConfigVar "SYNC_DB" )
-
-  # If sync db is on then download remote database
-  if [ "$SYNC_DB" = "1" ]; then
-
-    exportRemoteDatabase
-
-  fi
-
-  # Import database.sql file in to local mysql server
-  importLocalDatabase
+  # Export current staging db and local it in to local server
+  stan db exportstaging
+  stan db importlocal
 
   # Open frontend and backend in Chrome
   open -a 'Google Chrome' http://stan:4000/stan/

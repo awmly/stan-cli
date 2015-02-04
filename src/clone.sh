@@ -14,6 +14,4 @@ elif [ "$METHOD" = "clone" ]; then
   installGrunt
 
   # Show complete text
-  echo $HR
   echo $CLONE
-  echo $HR

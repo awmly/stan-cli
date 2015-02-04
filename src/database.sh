@@ -3,87 +3,110 @@ elif [ "$METHOD" = "db" ]; then
 
   if [ "${ARGS[1]}" = "conf" ]; then
 
-    # Get remote db variables from config
+    # Get production db variables from config
     DBHOST=$( getConfigVar "DBHOST" )
     DBUSER=$( getConfigVar "DBUSER" )
     DBPASS=$( getConfigVar "DBPASS" )
 
-    # Create mysql cnf file
-    echo "[client]" > database/remote.cnf
-    echo "host = ${DBHOST}" >> database/remote.cnf
-    echo "user = ${DBUSER}" >> database/remote.cnf
-    echo "password = ${DBPASS}" >> database/remote.cnf
+    # Create production mysql cnf file
+    echo "[client]" > database/production.cnf
+    echo "host = ${DBHOST}" >> database/production.cnf
+    echo "user = ${DBUSER}" >> database/production.cnf
+    echo "password = ${DBPASS}" >> database/production.cnf
+
+    # Get staging db variables from config
+    DBHOST=$( getConfigVar "DBHOST_STAGING" )
+    DBUSER=$( getConfigVar "DBUSER_STAGING" )
+    DBPASS=$( getConfigVar "DBPASS_STAGING" )
+
+    # Create staging mysql cnf file
+    echo "[client]" > database/staging.cnf
+    echo "host = ${DBHOST}" >> database/staging.cnf
+    echo "user = ${DBUSER}" >> database/staging.cnf
+    echo "password = ${DBPASS}" >> database/staging.cnf
 
     # Get local db variables from config
     DBHOST=$( getConfigVar "DBHOST_LOCAL" )
     DBUSER=$( getConfigVar "DBUSER_LOCAL" )
     DBPASS=$( getConfigVar "DBPASS_LOCAL" )
 
-    # Create mysql cnf file
+    # Create local mysql cnf file
     echo "[client]" > database/local.cnf
     echo "host = ${DBHOST}" >> database/local.cnf
     echo "user = ${DBUSER}" >> database/local.cnf
     echo "password = ${DBPASS}" >> database/local.cnf
 
     # Show complete text
-    echo $HR
     echo $DBCONF
-    echo $HR
 
-  elif [ "${ARGS[1]}" = "remotetolocal" ]; then
+  if [ "${ARGS[1]}" = "exportproduction" ]; then
 
-    # Export the remote database
-    stan db exportremote
+    # Get database name
+    DBNAME=$( getConfigVar "DBNAME" )
 
-    # Load the database in to local mysql server
-    stan db importlocal
-
-  elif [ "${ARGS[1]}" = "localtoremote" ]; then
-
-    # Export the local database
-    stan db exportlocal
-
-    # Load the database in to remote mysql server
-    stan db importremote
-
-  elif [ "${ARGS[1]}" = "exportremote" ]; then
-
-    # Export the local database
-    exportRemoteDatabase
+    # Run mysqldump command
+    mysqldump --defaults-extra-file=database/production.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo $HR
-    echo $EXPORTREMOTE
-    echo $HR
+    echo $EXPORT
+
+  elif  [ "${ARGS[1]}" = "importproduction" ]; then
+
+    # Get database name
+    DBNAME=$( getConfigVar "DBNAME" )
+
+    # Load database
+    mysql --defaults-extra-file=database/production.cnf $DBNAME < database/database.sql
+
+    # Show complete text
+    echo $IMPORT
+
+  elif [ "${ARGS[1]}" = "exportstaging" ]; then
+
+    # Get database name
+    DBNAME=$( getConfigVar "DBNAME_STAGING" )
+
+    # Run mysqldump command
+    mysqldump --defaults-extra-file=database/staging.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
+
+    # Show complete text
+    echo $EXPORT
+
+  elif  [ "${ARGS[1]}" = "importstaging" ]; then
+
+    # Get database name
+    DBNAME=$( getConfigVar "DBNAME_STAGING" )
+
+    # Load database
+    mysql --defaults-extra-file=database/staging.cnf $DBNAME < database/database.sql
+
+    # Show complete text
+    echo $IMPORT
 
   elif [ "${ARGS[1]}" = "exportlocal" ]; then
 
-    # Export the local database
-    exportLocalDatabase
+    # Get database name
+    DBNAME=$( getConfigVar "DBNAME_LOCAL" )
+
+    # Run mysqldump command
+    mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo $HR
-    echo $EXPORTLOCAL
-    echo $HR
+    echo $EXPORT
 
-  elif [ "${ARGS[1]}" = "importremote" ]; then
+  elif  [ "${ARGS[1]}" = "importlocal" ]; then
 
-    # Export the local database
-    importRemoteDatabase
+    # Get database name
+    DBNAME=$( getConfigVar "DBNAME_LOCAL" )
 
-    # Show complete text
-    echo $HR
-    echo $IMPORTREMOTE
-    echo $HR
-
-  elif [ "${ARGS[1]}" = "importlocal" ]; then
-
-    # Export the local database
-    importLocalDatabase
+    # Load database
+    mysql --defaults-extra-file=database/local.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo $HR
-    echo $IMPORTLOCAL
-    echo $HR
+    echo $IMPORT
+
+  else
+
+    echo $NOTFOUND
 
   fi

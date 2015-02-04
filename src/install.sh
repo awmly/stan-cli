@@ -4,8 +4,8 @@ elif [ "$METHOD" = "install" ]; then
   # Create mysql config files
   stan db conf
 
-  # Load database in to remote server
-  importRemoteDatabase
+  # Load database in to local server
+  stan db importlocal
 
   # Get config values from PHP
   DBNAME=$( getConfigVar "DBNAME" )
@@ -25,6 +25,4 @@ elif [ "$METHOD" = "install" ]; then
   stan upload
 
   # Show complete text
-  echo $HR
   echo $INSTALL
-  echo $HR

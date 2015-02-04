@@ -17,6 +17,4 @@ elif [ "$METHOD" = "remote" ]; then
   sudo chmod 0777 uploads
 
   # Show complete text
-  echo $HR
   echo $INITREMOTE
-  echo $HR

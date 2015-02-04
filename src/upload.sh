@@ -6,8 +6,18 @@ if [ "$METHOD" = "upload" ]; then
   find httpdocs/* -type f -print0 | xargs -0 chmod 0644
   chmod -R 0777 httpdocs/cache
 
-  # Get remote config
-  REMOTE=$( getConfigVar "REMOTE" )
+  # Check which remote to upload to
+  if [ "${ARGS[1]}" = "production" ]; then
+
+    # Get remote config for production
+    REMOTE=$( getConfigVar "REMOTE" )
+
+  else
+
+    # Get remote config for staging
+    REMOTE=$( getConfigVar "REMOTE_STAGING" )
+
+  fi
 
   # Run rsync command
   rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE
@@ -16,6 +26,4 @@ if [ "$METHOD" = "upload" ]; then
   grunt cloudfiles
 
   # Show complete text
-  echo $HR
   echo $UPLOAD
-  echo $HR
