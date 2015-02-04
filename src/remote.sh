@@ -12,6 +12,10 @@ elif [ "$METHOD" = "remote" ]; then
   sudo mkdir httpdocs
   sudo chown ${USER}:${GROUP} httpdocs httpdocs/. httpdocs/..
 
+  # Create new staging directory and change permissions
+  sudo mkdir staging
+  sudo chown ${USER}:${GROUP} staging staging/. staging/..
+
   # Create uploads directory
   sudo mkdir uploads
   sudo chmod 0777 uploads

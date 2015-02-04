@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 19:58 - 03/02/15 #######
+######## DATE 12:10 - 04/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -20,14 +20,14 @@ RED=`tput setaf 1`
 RESET=`tput sgr0`
 
 # Set complete strings
-INIT="${GREEN}✔ INIT COMPLETE ${RESET}\nLocal server now initialised - Edit httpdocs/config/config.php and then run 'stan install'"
-INITREMOTE="${GREEN}✔ INIT REMOTE COMPLETE ${RESET}\nRemote server is now configured - close the window and initialise local server"
-INSTALL="${GREEN}✔ INSTALL COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing"
-CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing"
+INIT="${HR}\n${GREEN}✔ INIT COMPLETE ${RESET}\nLocal server now initialised - Edit httpdocs/config/config.php and then run 'stan install'\n${HR}"
+INITREMOTE="${HR}\n${GREEN}✔ INIT REMOTE COMPLETE ${RESET}\nRemote server is now configured - close the window and initialise local server\n${HR}"
+INSTALL="${HR}\n${GREEN}✔ INSTALL COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing\n${HR}"
+CLONE="${HR}\n${GREEN}✔ CLONE COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing\n${HR}"
 
 # Set error strings
-NOTEMPTY="${RED}ERROR ${RESET}\nDirectory is not empty"
-NOSTAN="${RED}ERROR ${RESET}\nSTAN CLI is not installed - use grunt commands instead"
+NOTEMPTY="${HR}\n${RED}ERROR ${RESET}\nDirectory is not empty\n${HR}"
+NOSTAN="${HR}\n${RED}ERROR ${RESET}\nSTAN CLI is not installed - use grunt commands instead\n${HR}"
 
 # Define install Grunt function
 installGrunt(){
@@ -45,9 +45,7 @@ checkIfDirIsEmpty(){
 
   # Check if dir is empty - except for git folder auto created by github app
   if  [ "$(ls -A | grep -v .git)" ]; then
-    echo $HR
     echo $NOTEMPTY
-    echo $HR
     exit 1
   fi
 
@@ -59,9 +57,7 @@ checkIfStanIsInstalled(){
 
   # Check if stan-cli file exists
   if [ ! -f "./stan-cli" ]; then
-    echo $HR
     echo $NOSTAN
-    echo $HR
     exit 1
   fi
 
@@ -73,52 +69,6 @@ getConfigVar(){
 
   # Include config file and echo out variable
   php -r "include('httpdocs/config/config.php'); echo ${1};"
-
-}
-
-
-# Define get remote database function
-exportRemoteDatabase(){
-
-  # Get database name
-  DBNAME=$( getConfigVar "DBNAME" )
-
-  # Run mysqldump command
-  mysqldump --defaults-extra-file=database/remote.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
-
-}
-
-# Define get remote database function
-exportLocalDatabase(){
-
-  # Get database name
-  DBNAME=$( getConfigVar "DBNAME_LOCAL" )
-
-  # Run mysqldump command
-  mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
-
-}
-
-
-# Define get remote database function
-importRemoteDatabase(){
-
-  # Get database name
-  DBNAME=$( getConfigVar "DBNAME" )
-
-  # Load database
-  mysql --defaults-extra-file=database/remote.cnf $DBNAME < database/database.sql
-}
-
-
-# Define get remote database function
-importLocalDatabase(){
-
-  # Get database name
-  DBNAME=$( getConfigVar "DBNAME_LOCAL" )
-
-  # Load database
-  mysql --defaults-extra-file=database/local.cnf $DBNAME < database/database.sql
 
 }
 
@@ -142,9 +92,7 @@ if [ "$METHOD" = "init" ]; then
   atom ./
 
   # Show complete text
-  echo $HR
   echo $INIT
-  echo $HR
 
 # Define install method
 elif [ "$METHOD" = "install" ]; then
@@ -152,8 +100,8 @@ elif [ "$METHOD" = "install" ]; then
   # Create mysql config files
   stan db conf
 
-  # Load database in to remote server
-  importRemoteDatabase
+  # Load database in to local server
+  stan db importlocal
 
   # Get config values from PHP
   DBNAME=$( getConfigVar "DBNAME" )
@@ -173,9 +121,7 @@ elif [ "$METHOD" = "install" ]; then
   stan upload
 
   # Show complete text
-  echo $HR
   echo $INSTALL
-  echo $HR
 
 # Define init-remote method
 elif [ "$METHOD" = "remote" ]; then
@@ -191,14 +137,16 @@ elif [ "$METHOD" = "remote" ]; then
   sudo mkdir httpdocs
   sudo chown ${USER}:${GROUP} httpdocs httpdocs/. httpdocs/..
 
+  # Create new staging directory and change permissions
+  sudo mkdir staging
+  sudo chown ${USER}:${GROUP} staging staging/. staging/..
+
   # Create uploads directory
   sudo mkdir uploads
   sudo chmod 0777 uploads
 
   # Show complete text
-  echo $HR
   echo $INITREMOTE
-  echo $HR
 
 # Define clone method
 elif [ "$METHOD" = "clone" ]; then
@@ -216,9 +164,7 @@ elif [ "$METHOD" = "clone" ]; then
   installGrunt
 
   # Show complete text
-  echo $HR
   echo $CLONE
-  echo $HR
 
 # Define update method
 elif [ "$METHOD" = "update" ]; then
