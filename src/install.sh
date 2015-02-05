@@ -25,4 +25,4 @@ elif [ "$METHOD" = "install" ]; then
   stan upload
 
   # Show complete text
-  echo $INSTALL
+  echo -e $INSTALL

@@ -52,6 +52,12 @@ local:
 	@echo "${NL}" >> stan-cli
 	@cat src/upload.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
+	@cat src/deploy.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
+	@cat src/snapshot.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
+	@cat src/restore.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
 	@cat src/database.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
 	@@cat src/speed-test.sh >> stan-cli

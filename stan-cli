@@ -4,15 +4,15 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 15:25 - 04/02/15 #######
+######## DATE 17:13 - 05/02/15 #######
 ######################################
 
 # Get passed arguments
-METHOD="$1";
-ARGS=("$@");
+METHOD="$1"
+ARGS=("$@")
 
 # Set vars
-HR===============================================;
+HR===============================================
 
 # Set text colours
 GREEN=`tput setaf 2`
@@ -25,7 +25,18 @@ REBASE="${HR}\n${GREEN}✔ REBASE COMPLETE ${RESET}\n${HR}"
 IMPORT="${HR}\n${GREEN}✔ DATABASE IMPORTED ${RESET}\n${HR}"
 EXPORT="${HR}\n${GREEN}✔ DATABASE EXPORTED ${RESET}\n${HR}"
 DBCONF="${HR}\n${GREEN}✔ DATABASE CONFIG FILES CREATED ${RESET}\n${HR}"
+SNAPSHOT="${HR}\n${GREEN}✔ SNAPSHOT CREATED ${RESET}\n${HR}"
+DEPLOY="${HR}\n${GREEN}✔ SITE DEPLOYED TO PRODUCTION ${RESET}\n${HR}"
+RESTORE="${HR}\n${GREEN}✔ RESTORE COMPLETE ${RESET}\n${HR}"
+OPTIMISE="${HR}\n${GREEN}✔ IMAGE OPTIMISATION COMPLETE ${RESET}\n${HR}"
+
+# Set error strings
 NOTFOUND="${HR}\n${RED}COMMAND NOT FOUND${RESET}\n${HR}"
+RESTOREERROR="${HR}\n${RED}RESTORE SNAPSHOT NOT FOUND${RESET}\nPlease ensure snapshots/restore.tar.gz exists\n${HR}"
+
+# Set Propts
+DEPLOYPROMPT="This will copy the staging database and httpdocs to the production server - are you sure?"
+RESTOREPROMPT="This will delete the current production server and restore it from a snapshot - are you sure?"
 
 # Define install Grunt function
 installGrunt(){
@@ -43,7 +54,7 @@ checkIfDirIsEmpty(){
 
   # Check if dir is empty - except for git folder auto created by github app
   if  [ "$(ls -A | grep -v .git)" ]; then
-    echo $NOTEMPTY
+    echo -e $NOTEMPTY
     exit 1
   fi
 
@@ -55,7 +66,7 @@ checkIfStanIsInstalled(){
 
   # Check if stan-cli file exists
   if [ ! -f "./stan-cli" ]; then
-    echo $NOSTAN
+    echo -e $NOSTAN
     exit 1
   fi
 
@@ -65,8 +76,25 @@ checkIfStanIsInstalled(){
 # Define get config var function
 getConfigVar(){
 
-  # Include config file and echo out variable
-  php -r "include('httpdocs/config/config.php'); echo ${1};"
+  # Include config file and echo out variable - discard any php warnings/notices
+  php -r "include('httpdocs/config/config.php'); echo ${1};" 2> /dev/null
+
+}
+
+
+# Define prompt function
+prompt(){
+
+  # Confirm deployment
+  echo -e ${1}
+
+  # Show Y/N choices
+  select YN in "Yes" "No"; do
+      case $YN in
+          Yes ) break;;
+          No ) exit;;
+      esac
+  done
 
 }
 
@@ -78,27 +106,134 @@ if [ "$METHOD" = "upload" ]; then
   find httpdocs/* -type f -print0 | xargs -0 chmod 0644
   chmod -R 0777 httpdocs/cache
 
-  # Check which remote to upload to
-  if [ "${ARGS[1]}" = "production" ]; then
+  # Get remote from config
+  REMOTE=$( getConfigVar "REMOTE" )
 
-    # Get remote config for production
-    REMOTE=$( getConfigVar "REMOTE" )
+  # If upload is scripts
+  if [ "${ARGS[1]}" = "scripts" ]; then
+
+    # Upload scripts
+    rsync -trp --omit-dir-times --delete scripts/ ${REMOTE}scripts/
+
+    # Upload stan-cli
+    rsync -trp --omit-dir-times --delete stan-cli ${REMOTE}stan-cli
 
   else
 
-    # Get remote config for staging
-    REMOTE=$( getConfigVar "REMOTE_STAGING" )
+    # Get staging server config
+    STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
+
+    # Check which env to upload to
+    if [ "${ARGS[1]}" = "production" ] || [ "$STAGING_SERVER" = "" ]; then
+
+      # Production
+      REMOTE_PATH="httpdocs/"
+
+    else
+
+      # Staging
+      REMOTE_PATH="staging/"
+
+    fi
+
+    # Upload httpdocs
+    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ ${REMOTE}${REMOTE_PATH}
+
+    # Upload to CDN
+    grunt cloudfiles
 
   fi
 
-  # Run rsync command
-  rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE
+  # Show complete text
+  echo -e $UPLOAD
 
-  # Upload to CDN
-  grunt cloudfiles
+# Define deploy method
+elif [ "$METHOD" = "deploy" ]; then
+
+  # Confirm deployment
+  prompt $DEPLOYPROMPT
+
+  # Create snapshot
+  stan snapshot
+
+  # Copy staging to production
+  rsync -trp --omit-dir-times --delete staging/ httpdocs/
+
+  # Export staging db
+  stan db exportstaging
+
+  # Load in to production db
+  stan db importproduction
+
+  # Load custom deploy
+  scripts/deploy.sh
 
   # Show complete text
-  echo $UPLOAD
+  echo -e $DEPLOY
+
+# Define snapshot method
+elif [ "$METHOD" = "snapshot" ]; then
+
+  # Get domain
+  DOMAIN=$( getConfigVar "DOMAIN" )
+
+  # Set timestamp
+  TIMESTAMP=$( date +"%Y-%m-%d_%H-%M-%S" )
+
+  # Create db conf files
+  stan db conf
+
+  # Export production db
+  stan db exportproduction
+
+  # Move db to archive folder
+  mv database/database.sql httpdocs/database.sql
+
+  # Make archive directory
+  tar -zcvf snapshots/${DOMAIN}-${TIMESTAMP}.tar.gz httpdocs/ > /dev/null
+
+  # Show complete text
+  echo -e $SNAPSHOT
+
+# Define restore method
+elif [ "$METHOD" = "restore" ]; then
+
+  # Confirm restore
+  prompt $RESTOREPROMPT
+
+  # Check restore file is present
+  if [ -f "snapshots/restore.tar.gz" ]; then
+
+    # Extract restore file
+    tar -zxvf snapshots/restore.tar.gz
+
+    # Move database to database folder
+    mv snapshots/restore/database.sql databases/database.sql
+
+    # Restore database
+    stan db importproduction
+
+    # Remove database
+    rm snapshots/restore/database.sql
+
+    # Restore httpdocs
+    rsync -trp --omit-dir-times --delete snapshots/restore/ httpdocs/
+
+    # Ensure cache directory is writeable
+    chmod -R 0777 httpdocs/cache
+
+    # Delete extracted folder
+    rm -rf snapshots/restore
+
+    # Show complete text
+    echo $RESTORE
+
+  else
+
+    # Show error text
+    echo $RESTOREERROR
+
+  fi
 
 # Define syncdb method
 elif [ "$METHOD" = "db" ]; then
@@ -139,7 +274,7 @@ elif [ "$METHOD" = "db" ]; then
     echo "password = ${DBPASS}" >> database/local.cnf
 
     # Show complete text
-    echo $DBCONF
+    echo -e $DBCONF
 
   elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
@@ -150,7 +285,7 @@ elif [ "$METHOD" = "db" ]; then
     mysqldump --defaults-extra-file=database/production.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo $EXPORT
+    echo -e $EXPORT
 
   elif  [ "${ARGS[1]}" = "importproduction" ]; then
 
@@ -161,7 +296,7 @@ elif [ "$METHOD" = "db" ]; then
     mysql --defaults-extra-file=database/production.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo $IMPORT
+    echo -e $IMPORT
 
   elif [ "${ARGS[1]}" = "exportstaging" ]; then
 
@@ -172,7 +307,7 @@ elif [ "$METHOD" = "db" ]; then
     mysqldump --defaults-extra-file=database/staging.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo $EXPORT
+    echo -e $EXPORT
 
   elif  [ "${ARGS[1]}" = "importstaging" ]; then
 
@@ -183,7 +318,7 @@ elif [ "$METHOD" = "db" ]; then
     mysql --defaults-extra-file=database/staging.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo $IMPORT
+    echo -e $IMPORT
 
   elif [ "${ARGS[1]}" = "exportlocal" ]; then
 
@@ -194,7 +329,7 @@ elif [ "$METHOD" = "db" ]; then
     mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo $EXPORT
+    echo -e $EXPORT
 
   elif  [ "${ARGS[1]}" = "importlocal" ]; then
 
@@ -205,11 +340,11 @@ elif [ "$METHOD" = "db" ]; then
     mysql --defaults-extra-file=database/local.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo $IMPORT
+    echo -e $IMPORT
 
   else
 
-    echo $NOTFOUND
+    echo -e $NOTFOUND
 
   fi
 
@@ -251,13 +386,15 @@ elif [ "$METHOD" = "rebase" ]; then
   fi
 
   # Show complete text
-  echo $REBASE
+  echo -e $REBASE
 
 # Define optimise method
 elif [ "$METHOD" = "optimise" ]; then
 
   jpegoptim httpdocs/assets/frontend/images/*.jpg
   optipng -o5 httpdocs/assets/frontend/images/*.png
+
+  echo -e $OPTIMISE
 
 # Define default action
 elif [ "$METHOD" = "" ]; then

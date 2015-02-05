@@ -16,9 +16,26 @@ elif [ "$METHOD" = "remote" ]; then
   sudo mkdir staging
   sudo chown ${USER}:${GROUP} staging staging/. staging/..
 
+  # Create new database directory and change permissions
+  sudo mkdir database
+  sudo chown ${USER}:${GROUP} database database/. database/..
+
+  # Create new snapshots directory and change permissions
+  sudo mkdir snapshots
+  sudo chown ${USER}:${GROUP} snapshots snapshots/. snapshots/..
+
+  # Create new scripts directory and change permissions
+  sudo mkdir scripts
+  sudo chown ${USER}:${GROUP} scripts scripts/. scripts/..
+
+  # Create stan-cli file and change permission
+  sudo touch stan-cli
+  sudo chown ${USER}:${GROUP} stan-cli
+  sudo chmod +x stan-cli
+
   # Create uploads directory
-  sudo mkdir uploads
-  sudo chmod 0777 uploads
+  sudo mkdir uploads uploads/images uploads/downloads
+  sudo chmod -R 0777 uploads
 
   # Show complete text
-  echo $INITREMOTE
+  echo -e $INITREMOTE

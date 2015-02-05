@@ -1,9 +1,9 @@
 # Get passed arguments
-METHOD="$1";
-ARGS=("$@");
+METHOD="$1"
+ARGS=("$@")
 
 # Set vars
-HR===============================================;
+HR===============================================
 
 # Set text colours
 GREEN=`tput setaf 2`

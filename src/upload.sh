@@ -6,24 +6,43 @@ if [ "$METHOD" = "upload" ]; then
   find httpdocs/* -type f -print0 | xargs -0 chmod 0644
   chmod -R 0777 httpdocs/cache
 
-  # Check which remote to upload to
-  if [ "${ARGS[1]}" = "production" ]; then
+  # Get remote from config
+  REMOTE=$( getConfigVar "REMOTE" )
 
-    # Get remote config for production
-    REMOTE=$( getConfigVar "REMOTE" )
+  # If upload is scripts
+  if [ "${ARGS[1]}" = "scripts" ]; then
+
+    # Upload scripts
+    rsync -trp --omit-dir-times --delete scripts/ ${REMOTE}scripts/
+
+    # Upload stan-cli
+    rsync -trp --omit-dir-times --delete stan-cli ${REMOTE}stan-cli
 
   else
 
-    # Get remote config for staging
-    REMOTE=$( getConfigVar "REMOTE_STAGING" )
+    # Get staging server config
+    STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
+
+    # Check which env to upload to
+    if [ "${ARGS[1]}" = "production" ] || [ "$STAGING_SERVER" = "" ]; then
+
+      # Production
+      REMOTE_PATH="httpdocs/"
+
+    else
+
+      # Staging
+      REMOTE_PATH="staging/"
+
+    fi
+
+    # Upload httpdocs
+    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ ${REMOTE}${REMOTE_PATH}
+
+    # Upload to CDN
+    grunt cloudfiles
 
   fi
 
-  # Run rsync command
-  rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ $REMOTE
-
-  # Upload to CDN
-  grunt cloudfiles
-
   # Show complete text
-  echo $UPLOAD
+  echo -e $UPLOAD

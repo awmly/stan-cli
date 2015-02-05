@@ -24,4 +24,4 @@ elif [ "$METHOD" = "rebase" ]; then
   fi
 
   # Show complete text
-  echo $REBASE
+  echo -e $REBASE

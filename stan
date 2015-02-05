@@ -4,15 +4,15 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 15:25 - 04/02/15 #######
+######## DATE 17:13 - 05/02/15 #######
 ######################################
 
 # Get passed arguments
-METHOD="$1";
-ARGS=("$@");
+METHOD="$1"
+ARGS=("$@")
 
 # Set vars
-HR===============================================;
+HR===============================================
 
 # Set text colours
 GREEN=`tput setaf 2`
@@ -45,7 +45,7 @@ checkIfDirIsEmpty(){
 
   # Check if dir is empty - except for git folder auto created by github app
   if  [ "$(ls -A | grep -v .git)" ]; then
-    echo $NOTEMPTY
+    echo -e $NOTEMPTY
     exit 1
   fi
 
@@ -57,7 +57,7 @@ checkIfStanIsInstalled(){
 
   # Check if stan-cli file exists
   if [ ! -f "./stan-cli" ]; then
-    echo $NOSTAN
+    echo -e $NOSTAN
     exit 1
   fi
 
@@ -67,8 +67,25 @@ checkIfStanIsInstalled(){
 # Define get config var function
 getConfigVar(){
 
-  # Include config file and echo out variable
-  php -r "include('httpdocs/config/config.php'); echo ${1};"
+  # Include config file and echo out variable - discard any php warnings/notices
+  php -r "include('httpdocs/config/config.php'); echo ${1};" 2> /dev/null
+
+}
+
+
+# Define prompt function
+prompt(){
+
+  # Confirm deployment
+  echo -e ${1}
+
+  # Show Y/N choices
+  select YN in "Yes" "No"; do
+      case $YN in
+          Yes ) break;;
+          No ) exit;;
+      esac
+  done
 
 }
 
@@ -92,7 +109,7 @@ if [ "$METHOD" = "init" ]; then
   atom ./
 
   # Show complete text
-  echo $INIT
+  echo -e $INIT
 
 # Define install method
 elif [ "$METHOD" = "install" ]; then
@@ -121,7 +138,7 @@ elif [ "$METHOD" = "install" ]; then
   stan upload
 
   # Show complete text
-  echo $INSTALL
+  echo -e $INSTALL
 
 # Define init-remote method
 elif [ "$METHOD" = "remote" ]; then
@@ -141,12 +158,29 @@ elif [ "$METHOD" = "remote" ]; then
   sudo mkdir staging
   sudo chown ${USER}:${GROUP} staging staging/. staging/..
 
+  # Create new database directory and change permissions
+  sudo mkdir database
+  sudo chown ${USER}:${GROUP} database database/. database/..
+
+  # Create new snapshots directory and change permissions
+  sudo mkdir snapshots
+  sudo chown ${USER}:${GROUP} snapshots snapshots/. snapshots/..
+
+  # Create new scripts directory and change permissions
+  sudo mkdir scripts
+  sudo chown ${USER}:${GROUP} scripts scripts/. scripts/..
+
+  # Create stan-cli file and change permission
+  sudo touch stan-cli
+  sudo chown ${USER}:${GROUP} stan-cli
+  sudo chmod +x stan-cli
+
   # Create uploads directory
-  sudo mkdir uploads
-  sudo chmod 0777 uploads
+  sudo mkdir uploads uploads/images uploads/downloads
+  sudo chmod -R 0777 uploads
 
   # Show complete text
-  echo $INITREMOTE
+  echo -e $INITREMOTE
 
 # Define clone method
 elif [ "$METHOD" = "clone" ]; then
@@ -164,16 +198,15 @@ elif [ "$METHOD" = "clone" ]; then
   installGrunt
 
   # Show complete text
-  echo $CLONE
+  echo -e $CLONE
 
 # Define update method
 elif [ "$METHOD" = "update" ]; then
 
   if [ "${ARGS[1]}" = "global" ]; then
 
-    wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan
-    chmod +x stan
-    mv stan /usr/bin
+    wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan -O /usr/bin/stan
+    chmod +x /usr/bin/stan
 
   else
 
