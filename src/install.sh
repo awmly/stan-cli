@@ -27,4 +27,5 @@ elif [ "$METHOD" = "install" ]; then
   # Show complete text
   echo $HR
   echo $INSTALL
+  echo $INSTALL2
   echo $HR

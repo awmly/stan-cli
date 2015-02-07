@@ -20,4 +20,5 @@ if [ "$METHOD" = "init" ]; then
   # Show complete text
   echo $HR
   echo $INIT
+  echo $INIT2
   echo $HR

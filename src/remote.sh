@@ -41,5 +41,6 @@ elif [ "$METHOD" = "remote" ]; then
 
   # Show complete text
   echo $HR
-  echo $INITREMOTE
+  echo $REMOTE
+  echo $REMOTE2
   echo $HR

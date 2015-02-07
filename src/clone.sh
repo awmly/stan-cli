@@ -16,4 +16,5 @@ elif [ "$METHOD" = "clone" ]; then
   # Show complete text
   echo $HR
   echo $CLONE
+  echo $CLONE2
   echo $HR
