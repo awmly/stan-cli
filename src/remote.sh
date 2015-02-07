@@ -31,7 +31,7 @@ elif [ "$METHOD" = "remote" ]; then
   # Create stan-cli file and change permission
   sudo touch stan-cli
   sudo chown ${USER}:${GROUP} stan-cli
-  sudo chmod +x stan-cli
+  sudo chmod 0700 stan-cli
 
   # Create uploads directory
   sudo mkdir uploads uploads/images uploads/downloads

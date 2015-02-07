@@ -1,16 +1,14 @@
 # Define upload method
 if [ "$METHOD" = "upload" ]; then
 
-  # Set folder permissions
-  find httpdocs/* -type d -print0 | xargs -0 chmod 0755
-  find httpdocs/* -type f -print0 | xargs -0 chmod 0644
-  chmod -R 0777 httpdocs/cache
-
   # Get remote from config
   REMOTE=$( getConfigVar "REMOTE" )
 
   # If upload is scripts
   if [ "${ARGS[1]}" = "scripts" ]; then
+
+    # Set folder permissions
+    chmod 0700 stan-cli scripts/*
 
     # Upload scripts
     rsync -trp --omit-dir-times --delete scripts/ ${REMOTE}scripts/
@@ -20,24 +18,35 @@ if [ "$METHOD" = "upload" ]; then
 
   else
 
+    # Set folder permissions
+    find httpdocs/* -type d -print0 | xargs -0 chmod 0755
+    find httpdocs/* -type f -print0 | xargs -0 chmod 0644
+    chmod -R 0777 uploads httpdocs/cache
+
     # Get staging server config
     STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
 
     # Check which env to upload to
-    if [ "${ARGS[1]}" = "production" ] || [ "$STAGING_SERVER" = "" ]; then
-
-      # Production
-      REMOTE_PATH="httpdocs/"
-
-    else
+    if [ "$STAGING_SERVER" = "1" ]; then
 
       # Staging
       REMOTE_PATH="staging/"
+
+    else
+
+      # Production
+      REMOTE_PATH="httpdocs/"
 
     fi
 
     # Upload httpdocs
     rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ ${REMOTE}${REMOTE_PATH}
+
+    # Upload cache images (without --delete flag)
+    rsync -trp --omit-dir-times httpdocs/cache/images ${REMOTE}${REMOTE_PATH}cache/images
+
+    # Upload uploads
+    rsync -trp --omit-dir-times uploads/ ${REMOTE}uploads/
 
     # Upload to CDN
     grunt cloudfiles

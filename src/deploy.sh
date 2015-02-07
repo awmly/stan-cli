@@ -7,6 +7,9 @@ elif [ "$METHOD" = "deploy" ]; then
   # Create snapshot
   stan snapshot
 
+  # Copy cache from production to staging
+  rsync -trp --omit-dir-times httpdocs/cache/ staging/cache/
+
   # Copy staging to production
   rsync -trp --omit-dir-times --delete staging/ httpdocs/
 
