@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 17:13 - 05/02/15 #######
+######## DATE 18:01 - 07/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -20,14 +20,14 @@ RED=`tput setaf 1`
 RESET=`tput sgr0`
 
 # Set complete strings
-INIT="${HR}\n${GREEN}✔ INIT COMPLETE ${RESET}\nLocal server now initialised - Edit httpdocs/config/config.php and then run 'stan install'\n${HR}"
-INITREMOTE="${HR}\n${GREEN}✔ INIT REMOTE COMPLETE ${RESET}\nRemote server is now configured - close the window and initialise local server\n${HR}"
-INSTALL="${HR}\n${GREEN}✔ INSTALL COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing\n${HR}"
-CLONE="${HR}\n${GREEN}✔ CLONE COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing\n${HR}"
+INIT="${GREEN}✔ INIT COMPLETE ${RESET}\nLocal server now initialised - Edit httpdocs/config/config.php and then run 'stan install'"
+INITREMOTE="${GREEN}✔ INIT REMOTE COMPLETE ${RESET}\nRemote server is now configured - close the window and initialise local server"
+INSTALL="${GREEN}✔ INSTALL COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing"
+CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing"
 
 # Set error strings
-NOTEMPTY="${HR}\n${RED}ERROR ${RESET}\nDirectory is not empty\n${HR}"
-NOSTAN="${HR}\n${RED}ERROR ${RESET}\nSTAN CLI is not installed - use grunt commands instead\n${HR}"
+NOTEMPTY="${RED}ERROR ${RESET}\nDirectory is not empty"
+NOSTAN="${RED}ERROR ${RESET}\nSTAN CLI is not installed - use grunt commands instead"
 
 # Define install Grunt function
 installGrunt(){
@@ -45,7 +45,9 @@ checkIfDirIsEmpty(){
 
   # Check if dir is empty - except for git folder auto created by github app
   if  [ "$(ls -A | grep -v .git)" ]; then
-    echo -e $NOTEMPTY
+    echo $HR
+    echo $NOTEMPTY
+    echo $HR
     exit 1
   fi
 
@@ -57,7 +59,9 @@ checkIfStanIsInstalled(){
 
   # Check if stan-cli file exists
   if [ ! -f "./stan-cli" ]; then
-    echo -e $NOSTAN
+    echo $HR
+    echo $NOSTAN
+    echo $HR
     exit 1
   fi
 
@@ -77,7 +81,7 @@ getConfigVar(){
 prompt(){
 
   # Confirm deployment
-  echo -e ${1}
+  echo ${1}
 
   # Show Y/N choices
   select YN in "Yes" "No"; do
@@ -109,7 +113,9 @@ if [ "$METHOD" = "init" ]; then
   atom ./
 
   # Show complete text
-  echo -e $INIT
+  echo $HR
+  echo $INIT
+  echo $HR
 
 # Define install method
 elif [ "$METHOD" = "install" ]; then
@@ -138,7 +144,9 @@ elif [ "$METHOD" = "install" ]; then
   stan upload
 
   # Show complete text
-  echo -e $INSTALL
+  echo $HR
+  echo $INSTALL
+  echo $HR
 
 # Define init-remote method
 elif [ "$METHOD" = "remote" ]; then
@@ -147,8 +155,10 @@ elif [ "$METHOD" = "remote" ]; then
   USER="$(whoami)";
   GROUP="$(id -g -n $USER)";
 
-  # Move httpdocs to plesk default
-  sudo mv httpdocs/ plesk-default/
+  # Move httpdocs/staging to plesk default
+  sudo mkdir plesk-default
+  sudo mv httpdocs plesk-default/httpdocs
+  sudo mv staging plesk-default/staging
 
   # Create new httpdocs directory and change permissions
   sudo mkdir httpdocs
@@ -173,14 +183,16 @@ elif [ "$METHOD" = "remote" ]; then
   # Create stan-cli file and change permission
   sudo touch stan-cli
   sudo chown ${USER}:${GROUP} stan-cli
-  sudo chmod +x stan-cli
+  sudo chmod 0700 stan-cli
 
   # Create uploads directory
   sudo mkdir uploads uploads/images uploads/downloads
   sudo chmod -R 0777 uploads
 
   # Show complete text
-  echo -e $INITREMOTE
+  echo $HR
+  echo $INITREMOTE
+  echo $HR
 
 # Define clone method
 elif [ "$METHOD" = "clone" ]; then
@@ -198,7 +210,9 @@ elif [ "$METHOD" = "clone" ]; then
   installGrunt
 
   # Show complete text
-  echo -e $CLONE
+  echo $HR
+  echo $CLONE
+  echo $HR
 
 # Define update method
 elif [ "$METHOD" = "update" ]; then

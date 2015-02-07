@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 17:13 - 05/02/15 #######
+######## DATE 18:01 - 07/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -20,19 +20,20 @@ RED=`tput setaf 1`
 RESET=`tput sgr0`
 
 # Set complete strings
-UPLOAD="${HR}\n${GREEN}✔ UPLOAD COMPLETE ${RESET}\n${HR}"
-REBASE="${HR}\n${GREEN}✔ REBASE COMPLETE ${RESET}\n${HR}"
-IMPORT="${HR}\n${GREEN}✔ DATABASE IMPORTED ${RESET}\n${HR}"
-EXPORT="${HR}\n${GREEN}✔ DATABASE EXPORTED ${RESET}\n${HR}"
-DBCONF="${HR}\n${GREEN}✔ DATABASE CONFIG FILES CREATED ${RESET}\n${HR}"
-SNAPSHOT="${HR}\n${GREEN}✔ SNAPSHOT CREATED ${RESET}\n${HR}"
-DEPLOY="${HR}\n${GREEN}✔ SITE DEPLOYED TO PRODUCTION ${RESET}\n${HR}"
-RESTORE="${HR}\n${GREEN}✔ RESTORE COMPLETE ${RESET}\n${HR}"
-OPTIMISE="${HR}\n${GREEN}✔ IMAGE OPTIMISATION COMPLETE ${RESET}\n${HR}"
+UPLOAD="${GREEN}✔ UPLOAD COMPLETE ${RESET}"
+REBASE="${GREEN}✔ REBASE COMPLETE ${RESET}"
+IMPORT="${GREEN}✔ DATABASE IMPORTED ${RESET}"
+EXPORT="${GREEN}✔ DATABASE EXPORTED ${RESET}"
+DBCONF="${GREEN}✔ DATABASE CONFIG FILES CREATED ${RESET}"
+SNAPSHOT="${GREEN}✔ SNAPSHOT CREATED ${RESET}"
+DEPLOY="${GREEN}✔ SITE DEPLOYED TO PRODUCTION ${RESET}"
+RESTORE="${GREEN}✔ RESTORE COMPLETE ${RESET}"
+OPTIMISE="${GREEN}✔ IMAGE OPTIMISATION COMPLETE ${RESET}"
+HELP="For a list of available commands see - https://github.com/awomersley/stan-cli"
 
 # Set error strings
-NOTFOUND="${HR}\n${RED}COMMAND NOT FOUND${RESET}\n${HR}"
-RESTOREERROR="${HR}\n${RED}RESTORE SNAPSHOT NOT FOUND${RESET}\nPlease ensure snapshots/restore.tar.gz exists\n${HR}"
+NOTFOUND="${RED}COMMAND NOT FOUND${RESET}"
+RESTOREERROR="${RED}RESTORE SNAPSHOT NOT FOUND${RESET}\nPlease ensure snapshots/restore.tar.gz exists"
 
 # Set Propts
 DEPLOYPROMPT="This will copy the staging database and httpdocs to the production server - are you sure?"
@@ -54,7 +55,9 @@ checkIfDirIsEmpty(){
 
   # Check if dir is empty - except for git folder auto created by github app
   if  [ "$(ls -A | grep -v .git)" ]; then
-    echo -e $NOTEMPTY
+    echo $HR
+    echo $NOTEMPTY
+    echo $HR
     exit 1
   fi
 
@@ -66,7 +69,9 @@ checkIfStanIsInstalled(){
 
   # Check if stan-cli file exists
   if [ ! -f "./stan-cli" ]; then
-    echo -e $NOSTAN
+    echo $HR
+    echo $NOSTAN
+    echo $HR
     exit 1
   fi
 
@@ -86,7 +91,7 @@ getConfigVar(){
 prompt(){
 
   # Confirm deployment
-  echo -e ${1}
+  echo ${1}
 
   # Show Y/N choices
   select YN in "Yes" "No"; do
@@ -101,16 +106,14 @@ prompt(){
 # Define upload method
 if [ "$METHOD" = "upload" ]; then
 
-  # Set folder permissions
-  find httpdocs/* -type d -print0 | xargs -0 chmod 0755
-  find httpdocs/* -type f -print0 | xargs -0 chmod 0644
-  chmod -R 0777 httpdocs/cache
-
   # Get remote from config
   REMOTE=$( getConfigVar "REMOTE" )
 
   # If upload is scripts
   if [ "${ARGS[1]}" = "scripts" ]; then
+
+    # Set folder permissions
+    chmod 0700 stan-cli scripts/*
 
     # Upload scripts
     rsync -trp --omit-dir-times --delete scripts/ ${REMOTE}scripts/
@@ -120,24 +123,35 @@ if [ "$METHOD" = "upload" ]; then
 
   else
 
+    # Set folder permissions
+    find httpdocs/* -type d -print0 | xargs -0 chmod 0755
+    find httpdocs/* -type f -print0 | xargs -0 chmod 0644
+    chmod -R 0777 uploads httpdocs/cache
+
     # Get staging server config
     STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
 
     # Check which env to upload to
-    if [ "${ARGS[1]}" = "production" ] || [ "$STAGING_SERVER" = "" ]; then
-
-      # Production
-      REMOTE_PATH="httpdocs/"
-
-    else
+    if [ "$STAGING_SERVER" = "1" ]; then
 
       # Staging
       REMOTE_PATH="staging/"
+
+    else
+
+      # Production
+      REMOTE_PATH="httpdocs/"
 
     fi
 
     # Upload httpdocs
     rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ ${REMOTE}${REMOTE_PATH}
+
+    # Upload cache images (without --delete flag)
+    rsync -trp --omit-dir-times httpdocs/cache/images ${REMOTE}${REMOTE_PATH}cache/images
+
+    # Upload uploads
+    rsync -trp --omit-dir-times uploads/ ${REMOTE}uploads/
 
     # Upload to CDN
     grunt cloudfiles
@@ -145,7 +159,9 @@ if [ "$METHOD" = "upload" ]; then
   fi
 
   # Show complete text
-  echo -e $UPLOAD
+  echo $HR
+  echo $UPLOAD
+  echo $HR
 
 # Define deploy method
 elif [ "$METHOD" = "deploy" ]; then
@@ -155,6 +171,9 @@ elif [ "$METHOD" = "deploy" ]; then
 
   # Create snapshot
   stan snapshot
+
+  # Copy cache from production to staging
+  rsync -trp --omit-dir-times httpdocs/cache/ staging/cache/
 
   # Copy staging to production
   rsync -trp --omit-dir-times --delete staging/ httpdocs/
@@ -169,7 +188,9 @@ elif [ "$METHOD" = "deploy" ]; then
   scripts/deploy.sh
 
   # Show complete text
-  echo -e $DEPLOY
+  echo $HR
+  echo $DEPLOY
+  echo $HR
 
 # Define snapshot method
 elif [ "$METHOD" = "snapshot" ]; then
@@ -193,7 +214,9 @@ elif [ "$METHOD" = "snapshot" ]; then
   tar -zcvf snapshots/${DOMAIN}-${TIMESTAMP}.tar.gz httpdocs/ > /dev/null
 
   # Show complete text
-  echo -e $SNAPSHOT
+  echo $HR
+  echo $SNAPSHOT
+  echo $HR
 
 # Define restore method
 elif [ "$METHOD" = "restore" ]; then
@@ -205,33 +228,34 @@ elif [ "$METHOD" = "restore" ]; then
   if [ -f "snapshots/restore.tar.gz" ]; then
 
     # Extract restore file
-    tar -zxvf snapshots/restore.tar.gz
+    tar -zxvf snapshots/restore.tar.gz -C snapshots/ > /dev/null
 
     # Move database to database folder
-    mv snapshots/restore/database.sql databases/database.sql
+    mv snapshots/httpdocs/database.sql database/database.sql
 
     # Restore database
     stan db importproduction
 
-    # Remove database
-    rm snapshots/restore/database.sql
-
     # Restore httpdocs
-    rsync -trp --omit-dir-times --delete snapshots/restore/ httpdocs/
+    rsync -trp --omit-dir-times --delete snapshots/httpdocs/ httpdocs/ > /dev/null
 
     # Ensure cache directory is writeable
-    chmod -R 0777 httpdocs/cache
+    chmod -R 0777 httpdocs/cache 2> /dev/null
 
     # Delete extracted folder
-    rm -rf snapshots/restore
+    rm -rf snapshots/httpdocs
 
     # Show complete text
+    echo $HR
     echo $RESTORE
+    echo $HR
 
   else
 
     # Show error text
+    echo $HR
     echo $RESTOREERROR
+    echo $HR
 
   fi
 
@@ -274,7 +298,9 @@ elif [ "$METHOD" = "db" ]; then
     echo "password = ${DBPASS}" >> database/local.cnf
 
     # Show complete text
-    echo -e $DBCONF
+    echo $HR
+    echo $DBCONF
+    echo $HR
 
   elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
@@ -285,7 +311,9 @@ elif [ "$METHOD" = "db" ]; then
     mysqldump --defaults-extra-file=database/production.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo -e $EXPORT
+    echo $HR
+    echo $EXPORT
+    echo $HR
 
   elif  [ "${ARGS[1]}" = "importproduction" ]; then
 
@@ -296,7 +324,9 @@ elif [ "$METHOD" = "db" ]; then
     mysql --defaults-extra-file=database/production.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo -e $IMPORT
+    echo $HR
+    echo $IMPORT
+    echo $HR
 
   elif [ "${ARGS[1]}" = "exportstaging" ]; then
 
@@ -307,7 +337,9 @@ elif [ "$METHOD" = "db" ]; then
     mysqldump --defaults-extra-file=database/staging.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo -e $EXPORT
+    echo $HR
+    echo $EXPORT
+    echo $HR
 
   elif  [ "${ARGS[1]}" = "importstaging" ]; then
 
@@ -318,7 +350,9 @@ elif [ "$METHOD" = "db" ]; then
     mysql --defaults-extra-file=database/staging.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo -e $IMPORT
+    echo $HR
+    echo $IMPORT
+    echo $HR
 
   elif [ "${ARGS[1]}" = "exportlocal" ]; then
 
@@ -329,7 +363,9 @@ elif [ "$METHOD" = "db" ]; then
     mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo -e $EXPORT
+    echo $HR
+    echo $EXPORT
+    echo $HR
 
   elif  [ "${ARGS[1]}" = "importlocal" ]; then
 
@@ -340,11 +376,15 @@ elif [ "$METHOD" = "db" ]; then
     mysql --defaults-extra-file=database/local.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo -e $IMPORT
+    echo $HR
+    echo $IMPORT
+    echo $HR
 
   else
 
-    echo -e $NOTFOUND
+    echo $HR
+    echo $NOTFOUND
+    echo $HR
 
   fi
 
@@ -386,7 +426,9 @@ elif [ "$METHOD" = "rebase" ]; then
   fi
 
   # Show complete text
-  echo -e $REBASE
+  echo $HR
+  echo $REBASE
+  echo $HR
 
 # Define optimise method
 elif [ "$METHOD" = "optimise" ]; then
@@ -394,7 +436,9 @@ elif [ "$METHOD" = "optimise" ]; then
   jpegoptim httpdocs/assets/frontend/images/*.jpg
   optipng -o5 httpdocs/assets/frontend/images/*.png
 
-  echo -e $OPTIMISE
+  echo $HR
+  echo $OPTIMISE
+  echo $HR
 
 # Define default action
 elif [ "$METHOD" = "" ]; then
@@ -416,8 +460,8 @@ elif [ "$METHOD" = "" ]; then
   stan db importlocal
 
   # Open frontend and backend in Chrome
-  open -a 'Google Chrome' http://stan:4000/stan/
-  open -a 'Google Chrome' http://stan:4000/
+  sleep 1 && open -a 'Google Chrome' http://stan:4000/stan/ &
+  sleep 1 && open -a 'Google Chrome' http://stan:4000/ &
 
   # Start grunt server
   grunt serve
@@ -425,6 +469,8 @@ elif [ "$METHOD" = "" ]; then
 # Define help method
 else
 
-  echo "HELP"
+  echo $HR
+  echo $HELP
+  echo $HR
 
 fi
