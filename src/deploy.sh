@@ -23,4 +23,6 @@ elif [ "$METHOD" = "deploy" ]; then
   scripts/deploy.sh
 
   # Show complete text
-  echo -e $DEPLOY
+  echo $HR
+  echo $DEPLOY
+  echo $HR

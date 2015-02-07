@@ -5,8 +5,10 @@ elif [ "$METHOD" = "remote" ]; then
   USER="$(whoami)";
   GROUP="$(id -g -n $USER)";
 
-  # Move httpdocs to plesk default
-  sudo mv httpdocs/ plesk-default/
+  # Move httpdocs/staging to plesk default
+  sudo mkdir plesk-default
+  sudo mv httpdocs plesk-default/httpdocs
+  sudo mv staging plesk-default/staging
 
   # Create new httpdocs directory and change permissions
   sudo mkdir httpdocs
@@ -38,4 +40,6 @@ elif [ "$METHOD" = "remote" ]; then
   sudo chmod -R 0777 uploads
 
   # Show complete text
-  echo -e $INITREMOTE
+  echo $HR
+  echo $INITREMOTE
+  echo $HR

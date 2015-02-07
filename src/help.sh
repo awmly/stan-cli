@@ -1,6 +1,8 @@
 # Define help method
 else
 
-  echo "HELP"
+  echo $HR
+  echo $HELP
+  echo $HR
 
 fi

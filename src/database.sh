@@ -37,7 +37,9 @@ elif [ "$METHOD" = "db" ]; then
     echo "password = ${DBPASS}" >> database/local.cnf
 
     # Show complete text
-    echo -e $DBCONF
+    echo $HR
+    echo $DBCONF
+    echo $HR
 
   elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
@@ -48,7 +50,9 @@ elif [ "$METHOD" = "db" ]; then
     mysqldump --defaults-extra-file=database/production.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo -e $EXPORT
+    echo $HR
+    echo $EXPORT
+    echo $HR
 
   elif  [ "${ARGS[1]}" = "importproduction" ]; then
 
@@ -59,7 +63,9 @@ elif [ "$METHOD" = "db" ]; then
     mysql --defaults-extra-file=database/production.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo -e $IMPORT
+    echo $HR
+    echo $IMPORT
+    echo $HR
 
   elif [ "${ARGS[1]}" = "exportstaging" ]; then
 
@@ -70,7 +76,9 @@ elif [ "$METHOD" = "db" ]; then
     mysqldump --defaults-extra-file=database/staging.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo -e $EXPORT
+    echo $HR
+    echo $EXPORT
+    echo $HR
 
   elif  [ "${ARGS[1]}" = "importstaging" ]; then
 
@@ -81,7 +89,9 @@ elif [ "$METHOD" = "db" ]; then
     mysql --defaults-extra-file=database/staging.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo -e $IMPORT
+    echo $HR
+    echo $IMPORT
+    echo $HR
 
   elif [ "${ARGS[1]}" = "exportlocal" ]; then
 
@@ -92,7 +102,9 @@ elif [ "$METHOD" = "db" ]; then
     mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
 
     # Show complete text
-    echo -e $EXPORT
+    echo $HR
+    echo $EXPORT
+    echo $HR
 
   elif  [ "${ARGS[1]}" = "importlocal" ]; then
 
@@ -103,10 +115,14 @@ elif [ "$METHOD" = "db" ]; then
     mysql --defaults-extra-file=database/local.cnf $DBNAME < database/database.sql
 
     # Show complete text
-    echo -e $IMPORT
+    echo $HR
+    echo $IMPORT
+    echo $HR
 
   else
 
-    echo -e $NOTFOUND
+    echo $HR
+    echo $NOTFOUND
+    echo $HR
 
   fi

@@ -54,4 +54,6 @@ if [ "$METHOD" = "upload" ]; then
   fi
 
   # Show complete text
-  echo -e $UPLOAD
+  echo $HR
+  echo $UPLOAD
+  echo $HR

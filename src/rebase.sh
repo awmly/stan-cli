@@ -24,4 +24,6 @@ elif [ "$METHOD" = "rebase" ]; then
   fi
 
   # Show complete text
-  echo -e $REBASE
+  echo $HR
+  echo $REBASE
+  echo $HR

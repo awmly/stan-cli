@@ -14,7 +14,9 @@ checkIfDirIsEmpty(){
 
   # Check if dir is empty - except for git folder auto created by github app
   if  [ "$(ls -A | grep -v .git)" ]; then
-    echo -e $NOTEMPTY
+    echo $HR
+    echo $NOTEMPTY
+    echo $HR
     exit 1
   fi
 
@@ -26,7 +28,9 @@ checkIfStanIsInstalled(){
 
   # Check if stan-cli file exists
   if [ ! -f "./stan-cli" ]; then
-    echo -e $NOSTAN
+    echo $HR
+    echo $NOSTAN
+    echo $HR
     exit 1
   fi
 
@@ -46,7 +50,7 @@ getConfigVar(){
 prompt(){
 
   # Confirm deployment
-  echo -e ${1}
+  echo ${1}
 
   # Show Y/N choices
   select YN in "Yes" "No"; do

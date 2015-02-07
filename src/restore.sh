@@ -26,11 +26,15 @@ elif [ "$METHOD" = "restore" ]; then
     rm -rf snapshots/httpdocs
 
     # Show complete text
+    echo $HR
     echo $RESTORE
+    echo $HR
 
   else
 
     # Show error text
+    echo $HR
     echo $RESTOREERROR
+    echo $HR
 
   fi

@@ -20,4 +20,6 @@ elif [ "$METHOD" = "snapshot" ]; then
   tar -zcvf snapshots/${DOMAIN}-${TIMESTAMP}.tar.gz httpdocs/ > /dev/null
 
   # Show complete text
-  echo -e $SNAPSHOT
+  echo $HR
+  echo $SNAPSHOT
+  echo $HR
