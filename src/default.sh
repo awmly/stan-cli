@@ -18,8 +18,8 @@ elif [ "$METHOD" = "" ]; then
   stan db importlocal
 
   # Open frontend and backend in Chrome
-  open -a 'Google Chrome' http://stan:4000/stan/
-  open -a 'Google Chrome' http://stan:4000/
+  sleep 1 && open -a 'Google Chrome' http://stan:4000/stan/ &
+  sleep 1 && open -a 'Google Chrome' http://stan:4000/ &
 
   # Start grunt server
   grunt serve
