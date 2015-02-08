@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 18:01 - 07/02/15 #######
+######## DATE 14:11 - 08/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -20,14 +20,21 @@ RED=`tput setaf 1`
 RESET=`tput sgr0`
 
 # Set complete strings
-INIT="${GREEN}✔ INIT COMPLETE ${RESET}\nLocal server now initialised - Edit httpdocs/config/config.php and then run 'stan install'"
-INITREMOTE="${GREEN}✔ INIT REMOTE COMPLETE ${RESET}\nRemote server is now configured - close the window and initialise local server"
-INSTALL="${GREEN}✔ INSTALL COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing"
-CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}\nProject is now installed and set up - run stan to start developing"
+INIT="${GREEN}✔ INIT COMPLETE ${RESET}"
+INIT2="Local server now initialised - Edit httpdocs/config/config.php and then run 'stan install'"
+REMOTE="${GREEN}✔ INIT REMOTE COMPLETE ${RESET}"
+REMOTE2="Remote server is now configured - close the window and initialise local server"
+INSTALL="${GREEN}✔ INSTALL COMPLETE ${RESET}"
+INTSALL2="Project is now installed and set up - run stan to start developing"
+CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}"
+CLONE2="Project is now installed and set up - run stan to start developing"
 
 # Set error strings
 NOTEMPTY="${RED}ERROR ${RESET}\nDirectory is not empty"
 NOSTAN="${RED}ERROR ${RESET}\nSTAN CLI is not installed - use grunt commands instead"
+
+# Set Propts
+UPDATEPROMPT="This will update the local copy of stan-cli overwriting any custom methdos for current project - are you sure?"
 
 # Define install Grunt function
 installGrunt(){
@@ -115,6 +122,7 @@ if [ "$METHOD" = "init" ]; then
   # Show complete text
   echo $HR
   echo $INIT
+  echo $INIT2
   echo $HR
 
 # Define install method
@@ -146,6 +154,7 @@ elif [ "$METHOD" = "install" ]; then
   # Show complete text
   echo $HR
   echo $INSTALL
+  echo $INSTALL2
   echo $HR
 
 # Define init-remote method
@@ -155,43 +164,38 @@ elif [ "$METHOD" = "remote" ]; then
   USER="$(whoami)";
   GROUP="$(id -g -n $USER)";
 
-  # Move httpdocs/staging to plesk default
-  sudo mkdir plesk-default
-  sudo mv httpdocs plesk-default/httpdocs
-  sudo mv staging plesk-default/staging
+  # Change permissions of httpdocs
+  sudo chown -R ${USER}:${GROUP} httpdocs
 
-  # Create new httpdocs directory and change permissions
-  sudo mkdir httpdocs
-  sudo chown ${USER}:${GROUP} httpdocs httpdocs/. httpdocs/..
-
-  # Create new staging directory and change permissions
-  sudo mkdir staging
-  sudo chown ${USER}:${GROUP} staging staging/. staging/..
+  # Change permissionss of staging
+  sudo chown -R ${USER}:${GROUP} staging
 
   # Create new database directory and change permissions
   sudo mkdir database
-  sudo chown ${USER}:${GROUP} database database/. database/..
+  sudo chown -R ${USER}:${GROUP} database
 
   # Create new snapshots directory and change permissions
   sudo mkdir snapshots
-  sudo chown ${USER}:${GROUP} snapshots snapshots/. snapshots/..
+  sudo chown -R ${USER}:${GROUP} snapshots
 
   # Create new scripts directory and change permissions
   sudo mkdir scripts
-  sudo chown ${USER}:${GROUP} scripts scripts/. scripts/..
+  sudo chown -R ${USER}:${GROUP} scripts
+
+  # Create uploads directory
+  sudo mkdir uploads uploads/images uploads/downloads
+  sudo chown -R ${USER}:${GROUP} uploads
+  sudo chmod -R 0777 uploads
 
   # Create stan-cli file and change permission
   sudo touch stan-cli
   sudo chown ${USER}:${GROUP} stan-cli
   sudo chmod 0700 stan-cli
 
-  # Create uploads directory
-  sudo mkdir uploads uploads/images uploads/downloads
-  sudo chmod -R 0777 uploads
-
   # Show complete text
   echo $HR
-  echo $INITREMOTE
+  echo $REMOTE
+  echo $REMOTE2
   echo $HR
 
 # Define clone method
@@ -212,6 +216,7 @@ elif [ "$METHOD" = "clone" ]; then
   # Show complete text
   echo $HR
   echo $CLONE
+  echo $CLONE2
   echo $HR
 
 # Define update method
@@ -219,12 +224,21 @@ elif [ "$METHOD" = "update" ]; then
 
   if [ "${ARGS[1]}" = "global" ]; then
 
+    # Download from github
     wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan -O /usr/bin/stan
+
+    # Set permissions
     chmod +x /usr/bin/stan
 
   else
 
+    # Confirm update
+    prompt $UPDATEPROMPT
+
+    # Download from github
     wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan-cli -O ./stan-cli
+
+    # Set permissions
     chmod +x stan-cli
 
   fi
