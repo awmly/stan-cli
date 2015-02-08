@@ -5,39 +5,33 @@ elif [ "$METHOD" = "remote" ]; then
   USER="$(whoami)";
   GROUP="$(id -g -n $USER)";
 
-  # Move httpdocs/staging to plesk default
-  sudo mkdir plesk-default
-  sudo mv httpdocs plesk-default/httpdocs
-  sudo mv staging plesk-default/staging
+  # Change permissions of httpdocs
+  sudo chown -R ${USER}:${GROUP} httpdocs
 
-  # Create new httpdocs directory and change permissions
-  sudo mkdir httpdocs
-  sudo chown ${USER}:${GROUP} httpdocs httpdocs/. httpdocs/..
-
-  # Create new staging directory and change permissions
-  sudo mkdir staging
-  sudo chown ${USER}:${GROUP} staging staging/. staging/..
+  # Change permissionss of staging
+  sudo chown -R ${USER}:${GROUP} staging
 
   # Create new database directory and change permissions
   sudo mkdir database
-  sudo chown ${USER}:${GROUP} database database/. database/..
+  sudo chown -R ${USER}:${GROUP} database
 
   # Create new snapshots directory and change permissions
   sudo mkdir snapshots
-  sudo chown ${USER}:${GROUP} snapshots snapshots/. snapshots/..
+  sudo chown -R ${USER}:${GROUP} snapshots
 
   # Create new scripts directory and change permissions
   sudo mkdir scripts
-  sudo chown ${USER}:${GROUP} scripts scripts/. scripts/..
+  sudo chown -R ${USER}:${GROUP} scripts
+
+  # Create uploads directory
+  sudo mkdir uploads uploads/images uploads/downloads
+  sudo chown -R ${USER}:${GROUP} uploads
+  sudo chmod -R 0777 uploads
 
   # Create stan-cli file and change permission
   sudo touch stan-cli
   sudo chown ${USER}:${GROUP} stan-cli
   sudo chmod 0700 stan-cli
-
-  # Create uploads directory
-  sudo mkdir uploads uploads/images uploads/downloads
-  sudo chmod -R 0777 uploads
 
   # Show complete text
   echo $HR
