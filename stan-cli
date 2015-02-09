@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 11:59 - 09/02/15 #######
+######## DATE 12:48 - 09/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -38,44 +38,6 @@ RESTOREERROR="${RED}RESTORE SNAPSHOT NOT FOUND${RESET}"
 # Set Propts
 DEPLOYPROMPT="This will copy the staging database and httpdocs to the production server - are you sure?"
 RESTOREPROMPT="This will delete the current production server and restore it from a snapshot - are you sure?"
-
-# Define install Grunt function
-installGrunt(){
-
-  npm install
-  bower install
-  composer install
-  grunt update
-
-}
-
-# Define check if dir is empty function
-checkIfDirIsEmpty(){
-
-  # Check if dir is empty - except for git folder auto created by github app
-  if  [ "$(ls -A | grep -v .git)" ]; then
-    echo $HR
-    echo $NOTEMPTY
-    echo $NOTEMPTY2
-    echo $HR
-    exit 1
-  fi
-
-}
-
-# Define check if stan is installed function
-checkIfStanIsInstalled(){
-
-  # Check if stan-cli file exists
-  if [ ! -f "./stan-cli" ]; then
-    echo $HR
-    echo $NOSTAN
-    echo $NOSTAN2
-    echo $HR
-    exit 1
-  fi
-
-}
 
 # Define get config var function
 getConfigVar(){
@@ -111,6 +73,20 @@ prompt(){
 
 }
 
+# Define check if dir is empty function
+checkIfDirIsEmpty(){
+
+  # Check if dir is empty - except for git folder auto created by github app
+  if  [ "$(ls -A | grep -v .git)" ]; then
+    echo $HR
+    echo $NOTEMPTY
+    echo $NOTEMPTY2
+    echo $HR
+    exit 1
+  fi
+
+}
+
 # Define upload method
 if [ "$METHOD" = "upload" ]; then
 
@@ -135,6 +111,9 @@ if [ "$METHOD" = "upload" ]; then
     find httpdocs/* -type d -print0 | xargs -0 chmod 0755
     find httpdocs/* -type f -print0 | xargs -0 chmod 0644
     chmod -R 0777 uploads httpdocs/cache
+
+    # Remove source maps from minified files
+    stan remove-sourcemaps
 
     # Get staging server config
     STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
@@ -170,6 +149,35 @@ if [ "$METHOD" = "upload" ]; then
   echo $HR
   echo $UPLOAD
   echo $HR
+
+# Define build method
+elif [ "$METHOD" = "build" ]; then
+
+  # Check bower dependencies are up to date
+  bower install
+
+  # Copy jQuery from bower components to project
+  mkdir -p httpdocs/assets/frontend/libs/jquery/ && cp bower_components/jquery/dist/jquery.min.js httpdocs/assets/frontend/libs/jquery/
+
+  # Copy font awesome from bower components to project
+  mkdir -p httpdocs/assets/frontend/libs/fontawesome/css/ && cp bower_components/fontawesome/css/font-awesome.min.css httpdocs/assets/frontend/libs/fontawesome/css/
+  mkdir -p httpdocs/assets/frontend/libs/fontawesome/fonts/ && cp bower_components/fontawesome/fonts/* httpdocs/assets/frontend/libs/fontawesome/fonts/
+  mkdir -p httpdocs/cache/fonts && cp bower_components/fontawesome/fonts/* httpdocs/cache/fonts
+
+  # Load grunt build task - this will build our css/js files
+  grunt build
+
+# Define dependencies method
+elif [ "$METHOD" = "dependencies" ]; then
+
+  # Install node modules
+  npm install
+
+  # Install bower components
+  bower install
+
+  # Install PHP classes
+  composer install
 
 # Define deploy method
 elif [ "$METHOD" = "deploy" ]; then
@@ -478,8 +486,8 @@ elif [ "$METHOD" = "" ]; then
   # Rebase from remote
   stan rebase
 
-  # Update libs
-  grunt update
+  # Build JS/CSS libraries
+  stan build
 
   # Open atom
   atom ./
@@ -487,11 +495,10 @@ elif [ "$METHOD" = "" ]; then
   # Start mysql server
   mysql.server start
 
-  # Export current staging db and local it in to local server
-  stan db exportstaging
-  stan db importlocal
+  # Export current remote db and load it in to local server
+  stan db synclocal
 
-  # Open frontend and backend in Chrome
+  # Open frontend and backend in Chrome as background tasks
   sleep 1 && open -a 'Google Chrome' http://stan:4000/stan/ &
   sleep 1 && open -a 'Google Chrome' http://stan:4000/ &
 

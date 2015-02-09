@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 11:59 - 09/02/15 #######
+######## DATE 12:48 - 09/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -38,44 +38,6 @@ NOSTAN2="STAN CLI is not installed - use grunt commands instead"
 # Set Propts
 UPDATEPROMPT="This will update the local copy of stan-cli overwriting any custom methdos for current project - are you sure?"
 
-# Define install Grunt function
-installGrunt(){
-
-  npm install
-  bower install
-  composer install
-  grunt update
-
-}
-
-# Define check if dir is empty function
-checkIfDirIsEmpty(){
-
-  # Check if dir is empty - except for git folder auto created by github app
-  if  [ "$(ls -A | grep -v .git)" ]; then
-    echo $HR
-    echo $NOTEMPTY
-    echo $NOTEMPTY2
-    echo $HR
-    exit 1
-  fi
-
-}
-
-# Define check if stan is installed function
-checkIfStanIsInstalled(){
-
-  # Check if stan-cli file exists
-  if [ ! -f "./stan-cli" ]; then
-    echo $HR
-    echo $NOSTAN
-    echo $NOSTAN2
-    echo $HR
-    exit 1
-  fi
-
-}
-
 # Define get config var function
 getConfigVar(){
 
@@ -107,6 +69,20 @@ prompt(){
           No ) exit;;
       esac
   done
+
+}
+
+# Define check if dir is empty function
+checkIfDirIsEmpty(){
+
+  # Check if dir is empty - except for git folder auto created by github app
+  if  [ "$(ls -A | grep -v .git)" ]; then
+    echo $HR
+    echo $NOTEMPTY
+    echo $NOTEMPTY2
+    echo $HR
+    exit 1
+  fi
 
 }
 
@@ -150,8 +126,11 @@ elif [ "$METHOD" = "install" ]; then
   # Truncate uploads and satmp tables
   mysql --defaults-extra-file=database/staging.cnf $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
 
-  # Install node/grunt/bower/composer
-  installGrunt
+  # Install node/bower/composer dependencies
+  stan dependencies
+
+  # Build JS/CSS libraries
+  stan build
 
   # Perform inital commit
   git add .
@@ -222,8 +201,11 @@ elif [ "$METHOD" = "clone" ]; then
   # Clone repo in to current dir
   git clone git@gitlab.com:smartarts/${REPO}.git .
 
-  # Install node/grunt/bower/composer
-  installGrunt
+  # Install node/bower/composer dependencies
+  stan dependencies
+
+  # Build JS/CSS libraries
+  stan build
 
   # Show complete text
   echo $HR
@@ -257,10 +239,21 @@ elif [ "$METHOD" = "update" ]; then
 
 else
 
-  # Check stan is installed
-  checkIfStanIsInstalled
+  # Check if stan-cli file exists
+  if [ -f "stan-cli" ]; then
 
-  # Load local stan-cli in project
-  ./stan-cli $@
+    # Load local stan-cli in project
+    ./stan-cli $@
+
+  else
+
+    # Show error text
+    echo $HR
+    echo $NOSTAN
+    echo $NOSTAN2
+    echo $HR
+    exit 1
+
+  fi
 
 fi
