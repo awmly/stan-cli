@@ -23,6 +23,9 @@ if [ "$METHOD" = "upload" ]; then
     find httpdocs/* -type f -print0 | xargs -0 chmod 0644
     chmod -R 0777 uploads httpdocs/cache
 
+    # Remove source maps from minified files
+    stan remove-sourcemaps
+
     # Get staging server config
     STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
 

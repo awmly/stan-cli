@@ -10,8 +10,11 @@ elif [ "$METHOD" = "clone" ]; then
   # Clone repo in to current dir
   git clone git@gitlab.com:smartarts/${REPO}.git .
 
-  # Install node/grunt/bower/composer
-  installGrunt
+  # Install node/bower/composer dependencies
+  stan dependencies
+
+  # Build JS/CSS libraries
+  stan build
 
   # Show complete text
   echo $HR

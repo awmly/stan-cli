@@ -13,8 +13,11 @@ elif [ "$METHOD" = "install" ]; then
   # Truncate uploads and satmp tables
   mysql --defaults-extra-file=database/staging.cnf $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
 
-  # Install node/grunt/bower/composer
-  installGrunt
+  # Install node/bower/composer dependencies
+  stan dependencies
+
+  # Build JS/CSS libraries
+  stan build
 
   # Perform inital commit
   git add .
