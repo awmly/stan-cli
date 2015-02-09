@@ -56,6 +56,8 @@ local:
 	@echo "${NL}" >> stan-cli
 	@cat src/dependencies.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
+	@cat src/remove-sourcemaps.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
 	@cat src/deploy.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
 	@cat src/snapshot.sh >> stan-cli
