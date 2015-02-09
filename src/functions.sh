@@ -19,7 +19,7 @@ getConfigVar(){
 # Define prompt function
 prompt(){
 
-  # Confirm deployment
+  # Confirm
   echo ${1}
 
   # Show Y/N choices
