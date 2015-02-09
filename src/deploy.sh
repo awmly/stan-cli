@@ -2,7 +2,7 @@
 elif [ "$METHOD" = "deploy" ]; then
 
   # Confirm deployment
-  prompt $DEPLOYPROMPT
+  prompt "$DEPLOYPROMPT"
 
   # Create snapshot
   stan snapshot

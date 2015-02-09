@@ -12,7 +12,7 @@ elif [ "$METHOD" = "update" ]; then
   else
 
     # Confirm update
-    prompt $UPDATEPROMPT
+    prompt "$UPDATEPROMPT"
 
     # Download from github
     wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan-cli -O ./stan-cli

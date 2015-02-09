@@ -2,7 +2,7 @@
 elif [ "$METHOD" = "restore" ]; then
 
   # Confirm restore
-  prompt $RESTOREPROMPT
+  prompt "$RESTOREPROMPT"
 
   # Check restore file is present
   if [ -f "${ARGS[1]}" ]; then
