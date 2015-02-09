@@ -21,8 +21,10 @@ CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}"
 CLONE2="Project is now installed and set up - run stan to start developing"
 
 # Set error strings
-NOTEMPTY="${RED}ERROR ${RESET}\nDirectory is not empty"
-NOSTAN="${RED}ERROR ${RESET}\nSTAN CLI is not installed - use grunt commands instead"
+NOTEMPTY="${RED}ERROR ${RESET}"
+NOTEMPTY2="Directory is not empty"
+NOSTAN="${RED}ERROR ${RESET}"
+NOSTAN2="STAN CLI is not installed - use grunt commands instead"
 
 # Set Propts
 UPDATEPROMPT="This will update the local copy of stan-cli overwriting any custom methdos for current project - are you sure?"

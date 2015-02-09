@@ -23,6 +23,7 @@ elif [ "$METHOD" = "install" ]; then
 
   # Upload to server
   stan upload
+  stan upload scripts
 
   # Show complete text
   echo $HR

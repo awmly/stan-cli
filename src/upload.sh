@@ -7,7 +7,7 @@ if [ "$METHOD" = "upload" ]; then
   # If upload is scripts
   if [ "${ARGS[1]}" = "scripts" ]; then
 
-    # Set folder permissions
+    # Set permissions
     chmod 0700 stan-cli scripts/*
 
     # Upload scripts
@@ -40,10 +40,10 @@ if [ "$METHOD" = "upload" ]; then
     fi
 
     # Upload httpdocs
-    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ ${REMOTE}${REMOTE_PATH}
+    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
 
     # Upload cache images (without --delete flag)
-    rsync -trp --omit-dir-times httpdocs/cache/images ${REMOTE}${REMOTE_PATH}cache/images
+    rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
 
     # Upload uploads
     rsync -trp --omit-dir-times uploads/ ${REMOTE}uploads/

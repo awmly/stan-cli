@@ -41,6 +41,27 @@ elif [ "$METHOD" = "db" ]; then
     echo $DBCONF
     echo $HR
 
+  elif [ "${ARGS[1]}" = "synclocal" ]; then
+
+    # Get staging server value
+    STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
+
+    # If staging server is active
+    if [ "$STAGING_SERVER" = "1" ]; then
+
+      # Export staging
+      stan db exportstaging
+
+    else
+
+      # Export production
+      stan db exportproduction
+
+    fi
+
+    # Import in to local
+    stab db importlocal
+
   elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
     # Get database name

@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 14:11 - 08/02/15 #######
+######## DATE 11:59 - 09/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -33,7 +33,7 @@ HELP="For a list of available commands see - https://github.com/awomersley/stan-
 
 # Set error strings
 NOTFOUND="${RED}COMMAND NOT FOUND${RESET}"
-RESTOREERROR="${RED}RESTORE SNAPSHOT NOT FOUND${RESET}\nPlease ensure snapshots/restore.tar.gz exists"
+RESTOREERROR="${RED}RESTORE SNAPSHOT NOT FOUND${RESET}"
 
 # Set Propts
 DEPLOYPROMPT="This will copy the staging database and httpdocs to the production server - are you sure?"
@@ -49,7 +49,6 @@ installGrunt(){
 
 }
 
-
 # Define check if dir is empty function
 checkIfDirIsEmpty(){
 
@@ -57,12 +56,12 @@ checkIfDirIsEmpty(){
   if  [ "$(ls -A | grep -v .git)" ]; then
     echo $HR
     echo $NOTEMPTY
+    echo $NOTEMPTY2
     echo $HR
     exit 1
   fi
 
 }
-
 
 # Define check if stan is installed function
 checkIfStanIsInstalled(){
@@ -71,21 +70,30 @@ checkIfStanIsInstalled(){
   if [ ! -f "./stan-cli" ]; then
     echo $HR
     echo $NOSTAN
+    echo $NOSTAN2
     echo $HR
     exit 1
   fi
 
 }
 
-
 # Define get config var function
 getConfigVar(){
 
+  if [ -f "staging/config/config.php" ]; then
+
+    DIR="staging/"
+
+  else
+
+    DIR="httpdocs/"
+
+  fi
+
   # Include config file and echo out variable - discard any php warnings/notices
-  php -r "include('httpdocs/config/config.php'); echo ${1};" 2> /dev/null
+  php -r "include('${DIR}/config/config.php'); echo ${1};" 2> /dev/null
 
 }
-
 
 # Define prompt function
 prompt(){
@@ -112,7 +120,7 @@ if [ "$METHOD" = "upload" ]; then
   # If upload is scripts
   if [ "${ARGS[1]}" = "scripts" ]; then
 
-    # Set folder permissions
+    # Set permissions
     chmod 0700 stan-cli scripts/*
 
     # Upload scripts
@@ -145,10 +153,10 @@ if [ "$METHOD" = "upload" ]; then
     fi
 
     # Upload httpdocs
-    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp --exclude=cache/null httpdocs/ ${REMOTE}${REMOTE_PATH}
+    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
 
     # Upload cache images (without --delete flag)
-    rsync -trp --omit-dir-times httpdocs/cache/images ${REMOTE}${REMOTE_PATH}cache/images
+    rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
 
     # Upload uploads
     rsync -trp --omit-dir-times uploads/ ${REMOTE}uploads/
@@ -225,16 +233,19 @@ elif [ "$METHOD" = "restore" ]; then
   prompt $RESTOREPROMPT
 
   # Check restore file is present
-  if [ -f "snapshots/restore.tar.gz" ]; then
+  if [ -f "${ARGS[1]}" ]; then
 
     # Extract restore file
-    tar -zxvf snapshots/restore.tar.gz -C snapshots/ > /dev/null
+    tar -zxvf ${ARGS[1]} -C snapshots/ > /dev/null
 
     # Move database to database folder
     mv snapshots/httpdocs/database.sql database/database.sql
 
     # Restore database
     stan db importproduction
+
+    # Clear cache to avoid permission issues
+    rm -f httpdocs/cache/images/*
 
     # Restore httpdocs
     rsync -trp --omit-dir-times --delete snapshots/httpdocs/ httpdocs/ > /dev/null
@@ -301,6 +312,27 @@ elif [ "$METHOD" = "db" ]; then
     echo $HR
     echo $DBCONF
     echo $HR
+
+  elif [ "${ARGS[1]}" = "synclocal" ]; then
+
+    # Get staging server value
+    STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
+
+    # If staging server is active
+    if [ "$STAGING_SERVER" = "1" ]; then
+
+      # Export staging
+      stan db exportstaging
+
+    else
+
+      # Export production
+      stan db exportproduction
+
+    fi
+
+    # Import in to local
+    stab db importlocal
 
   elif [ "${ARGS[1]}" = "exportproduction" ]; then
 

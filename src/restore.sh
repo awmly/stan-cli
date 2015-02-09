@@ -5,16 +5,19 @@ elif [ "$METHOD" = "restore" ]; then
   prompt $RESTOREPROMPT
 
   # Check restore file is present
-  if [ -f "snapshots/restore.tar.gz" ]; then
+  if [ -f "${ARGS[1]}" ]; then
 
     # Extract restore file
-    tar -zxvf snapshots/restore.tar.gz -C snapshots/ > /dev/null
+    tar -zxvf ${ARGS[1]} -C snapshots/ > /dev/null
 
     # Move database to database folder
     mv snapshots/httpdocs/database.sql database/database.sql
 
     # Restore database
     stan db importproduction
+
+    # Clear cache to avoid permission issues
+    rm -f httpdocs/cache/images/*
 
     # Restore httpdocs
     rsync -trp --omit-dir-times --delete snapshots/httpdocs/ httpdocs/ > /dev/null

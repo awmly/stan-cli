@@ -8,7 +8,6 @@ installGrunt(){
 
 }
 
-
 # Define check if dir is empty function
 checkIfDirIsEmpty(){
 
@@ -16,12 +15,12 @@ checkIfDirIsEmpty(){
   if  [ "$(ls -A | grep -v .git)" ]; then
     echo $HR
     echo $NOTEMPTY
+    echo $NOTEMPTY2
     echo $HR
     exit 1
   fi
 
 }
-
 
 # Define check if stan is installed function
 checkIfStanIsInstalled(){
@@ -30,21 +29,30 @@ checkIfStanIsInstalled(){
   if [ ! -f "./stan-cli" ]; then
     echo $HR
     echo $NOSTAN
+    echo $NOSTAN2
     echo $HR
     exit 1
   fi
 
 }
 
-
 # Define get config var function
 getConfigVar(){
 
+  if [ -f "staging/config/config.php" ]; then
+
+    DIR="staging/"
+
+  else
+
+    DIR="httpdocs/"
+
+  fi
+
   # Include config file and echo out variable - discard any php warnings/notices
-  php -r "include('httpdocs/config/config.php'); echo ${1};" 2> /dev/null
+  php -r "include('${DIR}/config/config.php'); echo ${1};" 2> /dev/null
 
 }
-
 
 # Define prompt function
 prompt(){

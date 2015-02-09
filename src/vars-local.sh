@@ -24,7 +24,7 @@ HELP="For a list of available commands see - https://github.com/awomersley/stan-
 
 # Set error strings
 NOTFOUND="${RED}COMMAND NOT FOUND${RESET}"
-RESTOREERROR="${RED}RESTORE SNAPSHOT NOT FOUND${RESET}\nPlease ensure snapshots/restore.tar.gz exists"
+RESTOREERROR="${RED}RESTORE SNAPSHOT NOT FOUND${RESET}"
 
 # Set Propts
 DEPLOYPROMPT="This will copy the staging database and httpdocs to the production server - are you sure?"

@@ -8,7 +8,8 @@ elif [ "$METHOD" = "remote" ]; then
   # Change permissions of httpdocs
   sudo chown -R ${USER}:${GROUP} httpdocs
 
-  # Change permissionss of staging
+  # Make staging dierctory if needed and change permissions
+  sudo mkdir -p staging
   sudo chown -R ${USER}:${GROUP} staging
 
   # Create new database directory and change permissions

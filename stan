@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 14:11 - 08/02/15 #######
+######## DATE 11:59 - 09/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -30,8 +30,10 @@ CLONE="${GREEN}✔ CLONE COMPLETE ${RESET}"
 CLONE2="Project is now installed and set up - run stan to start developing"
 
 # Set error strings
-NOTEMPTY="${RED}ERROR ${RESET}\nDirectory is not empty"
-NOSTAN="${RED}ERROR ${RESET}\nSTAN CLI is not installed - use grunt commands instead"
+NOTEMPTY="${RED}ERROR ${RESET}"
+NOTEMPTY2="Directory is not empty"
+NOSTAN="${RED}ERROR ${RESET}"
+NOSTAN2="STAN CLI is not installed - use grunt commands instead"
 
 # Set Propts
 UPDATEPROMPT="This will update the local copy of stan-cli overwriting any custom methdos for current project - are you sure?"
@@ -46,7 +48,6 @@ installGrunt(){
 
 }
 
-
 # Define check if dir is empty function
 checkIfDirIsEmpty(){
 
@@ -54,12 +55,12 @@ checkIfDirIsEmpty(){
   if  [ "$(ls -A | grep -v .git)" ]; then
     echo $HR
     echo $NOTEMPTY
+    echo $NOTEMPTY2
     echo $HR
     exit 1
   fi
 
 }
-
 
 # Define check if stan is installed function
 checkIfStanIsInstalled(){
@@ -68,21 +69,30 @@ checkIfStanIsInstalled(){
   if [ ! -f "./stan-cli" ]; then
     echo $HR
     echo $NOSTAN
+    echo $NOSTAN2
     echo $HR
     exit 1
   fi
 
 }
 
-
 # Define get config var function
 getConfigVar(){
 
+  if [ -f "staging/config/config.php" ]; then
+
+    DIR="staging/"
+
+  else
+
+    DIR="httpdocs/"
+
+  fi
+
   # Include config file and echo out variable - discard any php warnings/notices
-  php -r "include('httpdocs/config/config.php'); echo ${1};" 2> /dev/null
+  php -r "include('${DIR}/config/config.php'); echo ${1};" 2> /dev/null
 
 }
-
 
 # Define prompt function
 prompt(){
@@ -150,6 +160,7 @@ elif [ "$METHOD" = "install" ]; then
 
   # Upload to server
   stan upload
+  stan upload scripts
 
   # Show complete text
   echo $HR
@@ -167,7 +178,8 @@ elif [ "$METHOD" = "remote" ]; then
   # Change permissions of httpdocs
   sudo chown -R ${USER}:${GROUP} httpdocs
 
-  # Change permissionss of staging
+  # Make staging dierctory if needed and change permissions
+  sudo mkdir -p staging
   sudo chown -R ${USER}:${GROUP} staging
 
   # Create new database directory and change permissions
