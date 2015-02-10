@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 12:48 - 09/02/15 #######
+######## DATE 11:59 - 10/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -59,7 +59,7 @@ getConfigVar(){
 # Define prompt function
 prompt(){
 
-  # Confirm deployment
+  # Confirm
   echo ${1}
 
   # Show Y/N choices
@@ -227,7 +227,7 @@ elif [ "$METHOD" = "update" ]; then
   else
 
     # Confirm update
-    prompt $UPDATEPROMPT
+    prompt "$UPDATEPROMPT"
 
     # Download from github
     wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan-cli -O ./stan-cli
