@@ -38,7 +38,7 @@ All commands are run within the terminal using the prefix `stan` and then specif
 `stan update` - This will update `./stan-cli` with the latest version from this repo. Note - this will overwrite any custom methods you have added to the current project.
 
 ##### Update - Global (L/R)
-`stan update global` - This will update `/usr/bin/stan` with the latest version from this repo.
+`stan update global` - This will update `/usr/bin/stan` with the latest version from this repo. Requires su permissions.
 
 
 ### Local Commands
@@ -62,11 +62,11 @@ All commands are run within the terminal using the prefix `stan` and then specif
 `stan optimise` - This will optimise images used within the project.
 
 ##### Database - Create Configs (L/R)
-`stan db conf` - This will create mysql.cnf files for the local, staging and production databases. This command will only need to be run if values change within `httpdocs/config/config.php`. 
+`stan db conf` - This will create mysql.cnf files for the local, staging and production databases. This command will only need to be run if values change within `httpdocs/config/config.php`.
 
 ##### Database - Sync Local (L)
 `stan db synclocal` - Exports the current staging or production database (based on `$STAGING_SERVER` value) and loads it in to the local mysql server.
- 
+
 ##### Database - Export Local (L)
 `stan db exportlocal` - Export the current local database to `database/database.sql`.
 
@@ -86,11 +86,10 @@ All commands are run within the terminal using the prefix `stan` and then specif
 `stan db importproduction` - Import `database/database.sql` in to the production mysql server.
 
 ##### Deploy (R)
-`stan deploy` - This will deploy the current project/database from staging to production. A snapshot of tje production environment is automatically created. 
+`stan deploy` - This will deploy the current project/database from staging to production. A snapshot of tje production environment is automatically created.
 
 ##### Snapshot (R)
 `stan snapshot` - Create a snapshot of the current production environment. This will create an archive of the current httpdocs directory along with a copy of the production database. It will be stored in `snapshots/[sitename]-[timestame].tar.gz`.
 
 ##### Restore (R)
-`stan restore snapshots/[filename]` - This will delete the current production environment (no snapshot taken) and load in the specified snapshot. 
-
+`stan restore snapshots/[filename]` - This will delete the current production environment (no snapshot taken) and load in the specified snapshot.
