@@ -2,10 +2,10 @@
 elif [ "$METHOD" = "remove-sourcemaps" ]; then
 
   # Get site ID
-  SITE_ID=$( getConfigVar "SITE_ID" )
+  VHOST=$( getConfigVar "VHOST" )
 
   # Remove css maps
-  sed -i '' 's/sourceMappingURL=.*\.map//g' httpdocs/cache/assets/${SITE_ID}-*.css
+  sed -i '' 's/sourceMappingURL=.*\.map//g' httpdocs/cache/assets/${VHOST}-*.css
 
   # Remove js maps
-  sed -i '' 's/\/\/# sourceMappingURL=.*\.map//g' httpdocs/cache/assets/${SITE_ID}-*.js
+  sed -i '' 's/\/\/# sourceMappingURL=.*\.map//g' httpdocs/cache/assets/${VHOST}-*.js
