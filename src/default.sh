@@ -18,7 +18,7 @@ elif [ "$METHOD" = "" ]; then
 
   # Open frontend and backend in Chrome as background tasks
   sleep 1 && open -a 'Google Chrome' http://stan:4000/stan/ &
-  sleep 1 && open -a 'Google Chrome' http://stan:4000/ &
+  sleep 2 && open -a 'Google Chrome' http://stan:4000/ &
 
   # Start grunt server
   grunt serve
