@@ -54,6 +54,10 @@ if [ "$METHOD" = "upload" ]; then
     # Upload to CDN
     grunt cloudfiles
 
+    # Clear cache/uploads directories
+    rm -f uploads/images/*
+    rm -f httpdocs/cache/images/*
+
   fi
 
   # Show complete text
