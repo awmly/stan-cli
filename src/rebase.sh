@@ -12,6 +12,9 @@ elif [ "$METHOD" = "rebase" ]; then
 
   else
 
+    # Clear any pervious stashes
+    git stash clear
+
     # Stash any un-commited files
     git stash
 
