@@ -1,0 +1,6 @@
+language: c
+
+script:
+  - make global
+  - make local
+  - ./stan test
