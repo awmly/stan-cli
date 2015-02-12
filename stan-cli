@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 13:11 - 12/02/15 #######
+######## DATE 15:40 - 12/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -209,7 +209,7 @@ elif [ "$METHOD" = "deploy" ]; then
   rsync -trp --omit-dir-times --delete --exclude=cache/images staging/ httpdocs/
 
   # Copy staging cache to production cache (without --delete flag)
-  rsync -trp --omit-dir-times staging/cache/images httpdocs/cache/images
+  rsync -trp --omit-dir-times staging/cache/images/ httpdocs/cache/images/
 
   # Export staging db
   stan db exportstaging
@@ -244,7 +244,7 @@ elif [ "$METHOD" = "snapshot" ]; then
   mv database/database.sql httpdocs/database.sql
 
   # Make archive directory
-  tar -zcvf snapshots/${DOMAIN}-${TIMESTAMP}.tar.gz httpdocs/ > /dev/null
+  tar -zcvf snapshots/${DOMAIN}-${TIMESTAMP}.tar.gz httpdocs/ uploads/ > /dev/null
 
   # Show complete text
   echo $HR
