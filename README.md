@@ -1,6 +1,4 @@
-# STAN CLI
-
-[![Build Status](https://travis-ci.org/awomersley/stan-cli.svg?branch=master)](https://travis-ci.org/awomersley/stan-cli)
+# STAN CLI  [![Build Status](https://travis-ci.org/awomersley/stan-cli.svg?branch=master)](https://travis-ci.org/awomersley/stan-cli)
 
 STAN CLI is a command line interface for development on STAN admin. STAN CLI is split in to two shell scripts; a global app which will handle the core functionality inititialisaton, install, clone etc. This should live in a dir listed in the export path - eg `/usr/bin/stan`.
 
