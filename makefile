@@ -7,7 +7,7 @@ $NL="\r"
 
 # Build STAN CLI From Source
 global:
-	@echo "#! /bin/sh" > stan
+	@echo "#! /bin/bash" > stan
 	@echo "${NL}" >> stan
 	@echo "######################################" >> stan
 	@echo "#### STAN Command Line Interface #####" >> stan
@@ -37,7 +37,7 @@ global:
 
 # Build STAN CLI From Source
 local:
-	@echo "#! /bin/sh" > stan-cli
+	@echo "#! /bin/bash" > stan-cli
 	@echo "${NL}" >> stan-cli
 	@echo "######################################" >> stan-cli
 	@echo "#### STAN Command Line Interface #####" >> stan-cli

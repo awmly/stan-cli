@@ -1,4 +1,4 @@
-language: sh
+language: bash
 
 script:
   - make global

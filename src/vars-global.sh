@@ -1,6 +1,6 @@
 # Get passed arguments
 METHOD="$1"
-#ARGS=("$@")
+ARGS=("$@")
 
 # Set vars
 HR===============================================
