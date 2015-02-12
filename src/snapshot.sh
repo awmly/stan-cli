@@ -17,7 +17,7 @@ elif [ "$METHOD" = "snapshot" ]; then
   mv database/database.sql httpdocs/database.sql
 
   # Make archive directory
-  tar -zcvf snapshots/${DOMAIN}-${TIMESTAMP}.tar.gz httpdocs/ > /dev/null
+  tar -zcvf snapshots/${DOMAIN}-${TIMESTAMP}.tar.gz httpdocs/ uploads/ > /dev/null
 
   # Show complete text
   echo $HR
