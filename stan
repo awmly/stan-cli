@@ -4,12 +4,12 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 09:38 - 12/02/15 #######
+######## DATE 12:49 - 12/02/15 #######
 ######################################
 
 # Get passed arguments
 METHOD="$1"
-ARGS=("$@")
+#ARGS=("$@")
 
 # Set vars
 HR===============================================
@@ -60,10 +60,11 @@ getConfigVar(){
 prompt(){
 
   # Confirm
-  echo ${1}
+  echo "${1}"
 
   # Show Y/N choices
-  select YN in "Yes" "No"; do
+  select YN in "Yes No"
+  do
       case $YN in
           Yes ) break;;
           No ) exit;;
@@ -78,8 +79,8 @@ checkIfDirIsEmpty(){
   # Check if dir is empty - except for git folder auto created by github app
   if  [ "$(ls -A | grep -v .git)" ]; then
     echo $HR
-    echo $NOTEMPTY
-    echo $NOTEMPTY2
+    echo "$NOTEMPTY"
+    echo "$NOTEMPTY2"
     echo $HR
     exit 1
   fi

@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 17:30 - 11/02/15 #######
+######## DATE 12:49 - 12/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -61,10 +61,11 @@ getConfigVar(){
 prompt(){
 
   # Confirm
-  echo ${1}
+  echo "${1}"
 
   # Show Y/N choices
-  select YN in "Yes" "No"; do
+  select YN in "Yes No"
+  do
       case $YN in
           Yes ) break;;
           No ) exit;;
@@ -79,8 +80,8 @@ checkIfDirIsEmpty(){
   # Check if dir is empty - except for git folder auto created by github app
   if  [ "$(ls -A | grep -v .git)" ]; then
     echo $HR
-    echo $NOTEMPTY
-    echo $NOTEMPTY2
+    echo "$NOTEMPTY"
+    echo "$NOTEMPTY2"
     echo $HR
     exit 1
   fi
@@ -142,6 +143,10 @@ if [ "$METHOD" = "upload" ]; then
 
     # Upload to CDN
     grunt cloudfiles
+
+    # Clear cache/uploads directories
+    rm -f uploads/images/*
+    rm -f httpdocs/cache/images/*
 
   fi
 
@@ -352,7 +357,7 @@ elif [ "$METHOD" = "db" ]; then
     fi
 
     # Import in to local
-    stab db importlocal
+    stan db importlocal
 
   elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
@@ -466,6 +471,9 @@ elif [ "$METHOD" = "rebase" ]; then
 
   else
 
+    # Clear any pervious stashes
+    git stash clear
+
     # Stash any un-commited files
     git stash
 
@@ -512,7 +520,7 @@ elif [ "$METHOD" = "" ]; then
 
   # Open frontend and backend in Chrome as background tasks
   sleep 1 && open -a 'Google Chrome' http://stan:4000/stan/ &
-  sleep 1 && open -a 'Google Chrome' http://stan:4000/ &
+  sleep 2 && open -a 'Google Chrome' http://stan:4000/ &
 
   # Start grunt server
   grunt serve
