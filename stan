@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.0 ############
-######## DATE 17:30 - 11/02/15 #######
+######## DATE 09:38 - 12/02/15 #######
 ######################################
 
 # Get passed arguments
@@ -162,19 +162,19 @@ elif [ "$METHOD" = "remote" ]; then
   sudo chown -R ${USER}:${GROUP} staging
 
   # Create new database directory and change permissions
-  sudo mkdir database
+  sudo mkdir -p database
   sudo chown -R ${USER}:${GROUP} database
 
   # Create new snapshots directory and change permissions
-  sudo mkdir snapshots
+  sudo mkdir -p snapshots
   sudo chown -R ${USER}:${GROUP} snapshots
 
   # Create new scripts directory and change permissions
-  sudo mkdir scripts
+  sudo mkdir -p scripts
   sudo chown -R ${USER}:${GROUP} scripts
 
   # Create uploads directory
-  sudo mkdir uploads uploads/images uploads/downloads
+  sudo mkdir -p uploads uploads/images uploads/downloads
   sudo chown -R ${USER}:${GROUP} uploads
   sudo chmod -R 0777 uploads
 
