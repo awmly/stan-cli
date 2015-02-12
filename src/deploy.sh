@@ -11,7 +11,7 @@ elif [ "$METHOD" = "deploy" ]; then
   rsync -trp --omit-dir-times --delete --exclude=cache/images staging/ httpdocs/
 
   # Copy staging cache to production cache (without --delete flag)
-  rsync -trp --omit-dir-times staging/cache/images httpdocs/cache/images
+  rsync -trp --omit-dir-times staging/cache/images/ httpdocs/cache/images/
 
   # Export staging db
   stan db exportstaging
