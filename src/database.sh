@@ -60,7 +60,7 @@ elif [ "$METHOD" = "db" ]; then
     fi
 
     # Import in to local
-    stab db importlocal
+    stan db importlocal
 
   elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
