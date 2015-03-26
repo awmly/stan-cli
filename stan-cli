@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
-########### VERSION 1.0.0 ############
-######## DATE 15:40 - 12/02/15 #######
+########### VERSION 1.0.1 ############
+######## DATE 13:02 - 26/03/15 #######
 ######################################
 
 # Get passed arguments
@@ -38,6 +38,7 @@ RESTOREERROR="${RED}RESTORE SNAPSHOT NOT FOUND${RESET}"
 # Set Propts
 DEPLOYPROMPT="This will copy the staging database and httpdocs to the production server - are you sure?"
 RESTOREPROMPT="This will delete the current production server and restore it from a snapshot - are you sure?"
+UPLOADPROMPT="This will upload to"
 
 # Define get config var function
 getConfigVar(){
@@ -64,7 +65,7 @@ prompt(){
   echo "${1}"
 
   # Show Y/N choices
-  select YN in "Yes No"
+  select YN in "Yes" "No"
   do
       case $YN in
           Yes ) break;;
@@ -131,6 +132,9 @@ if [ "$METHOD" = "upload" ]; then
       REMOTE_PATH="httpdocs/"
 
     fi
+
+    # Show prompt
+    prompt "${UPLOADPROMPT} ${REMOTE}${REMOTE_PATH}"
 
     # Upload httpdocs
     rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
@@ -489,6 +493,13 @@ elif [ "$METHOD" = "rebase" ]; then
   echo $HR
   echo $REBASE
   echo $HR
+
+# Define reset method
+elif [ "$METHOD" = "reset" ]; then
+
+  # Prompt!
+  # Reset to last commit
+  git reset --hard HEAD
 
 # Define optimise method
 elif [ "$METHOD" = "optimise" ]; then

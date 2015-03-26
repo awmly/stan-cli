@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
-########### VERSION 1.0.0 ############
-######## DATE 15:40 - 12/02/15 #######
+########### VERSION 1.0.1 ############
+######## DATE 13:02 - 26/03/15 #######
 ######################################
 
 # Get passed arguments
@@ -63,7 +63,7 @@ prompt(){
   echo "${1}"
 
   # Show Y/N choices
-  select YN in "Yes No"
+  select YN in "Yes" "No"
   do
       case $YN in
           Yes ) break;;
