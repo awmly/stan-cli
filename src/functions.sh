@@ -23,7 +23,7 @@ prompt(){
   echo "${1}"
 
   # Show Y/N choices
-  select YN in "Yes No"
+  select YN in "Yes" "No"
   do
       case $YN in
           Yes ) break;;
