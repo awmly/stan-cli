@@ -42,6 +42,9 @@ if [ "$METHOD" = "upload" ]; then
 
     fi
 
+    # Show prompt
+    prompt "${UPLOADPROMPT} ${REMOTE}${REMOTE_PATH}"
+
     # Upload httpdocs
     rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
 

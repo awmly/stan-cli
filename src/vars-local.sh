@@ -29,3 +29,4 @@ RESTOREERROR="${RED}RESTORE SNAPSHOT NOT FOUND${RESET}"
 # Set Propts
 DEPLOYPROMPT="This will copy the staging database and httpdocs to the production server - are you sure?"
 RESTOREPROMPT="This will delete the current production server and restore it from a snapshot - are you sure?"
+UPLOADPROMPT="This will upload to"
