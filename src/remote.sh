@@ -7,6 +7,7 @@ elif [ "$METHOD" = "remote" ]; then
 
   # Change permissions of httpdocs
   sudo chown -R ${USER}:${GROUP} httpdocs
+  sudo chmod 0775 -R httpdocs
 
   # Make staging dierctory if needed and change permissions
   sudo mkdir -p staging
