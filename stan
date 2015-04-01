@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.1 ############
-######## DATE 13:02 - 26/03/15 #######
+######## DATE 13:09 - 01/04/15 #######
 ######################################
 
 # Get passed arguments
@@ -157,6 +157,7 @@ elif [ "$METHOD" = "remote" ]; then
 
   # Change permissions of httpdocs
   sudo chown -R ${USER}:${GROUP} httpdocs
+  sudo chmod 0775 -R httpdocs
 
   # Make staging dierctory if needed and change permissions
   sudo mkdir -p staging
