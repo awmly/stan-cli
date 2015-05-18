@@ -4,6 +4,9 @@ elif [ "$METHOD" = "clone" ]; then
   # Check dir is empty
   checkIfDirIsEmpty
 
+  # Remove git directory created by github app
+  rm -rf .git
+
   # Set repo based on current dir
   REPO=${PWD##*/}
 
