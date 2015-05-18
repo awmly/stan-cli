@@ -1,5 +1,5 @@
 # Set some vars
-VERSION=1.0.0
+VERSION=1.0.3
 TICK=\033[32m✔\033[39m
 DATE=$(shell date +"%H:%M - %d/%m/%y")
 $NL="\r"
@@ -69,6 +69,8 @@ local:
 	@@cat src/speed-test.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
 	@cat src/rebase.sh >> stan-cli
+	@echo "${NL}" >> stan-cli
+	@cat src/reset.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
 	@cat src/optimise.sh >> stan-cli
 	@echo "${NL}" >> stan-cli

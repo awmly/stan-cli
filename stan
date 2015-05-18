@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
-########### VERSION 1.0.1 ############
-######## DATE 13:09 - 01/04/15 #######
+########### VERSION 1.0.3 ############
+######## DATE 16:08 - 18/05/15 #######
 ######################################
 
 # Get passed arguments
@@ -196,6 +196,9 @@ elif [ "$METHOD" = "clone" ]; then
 
   # Check dir is empty
   checkIfDirIsEmpty
+
+  # Remove git directory created by github app
+  rm -rf .git
 
   # Set repo based on current dir
   REPO=${PWD##*/}
