@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
-########### VERSION 1.0.3 ############
-######## DATE 16:08 - 18/05/15 #######
+########### VERSION 1.0.4 ############
+######## DATE 09:02 - 19/05/15 #######
 ######################################
 
 # Get passed arguments
@@ -118,6 +118,9 @@ elif [ "$METHOD" = "install" ]; then
   # Create mysql config files
   stan db conf
 
+  # Rename database so it can be imported
+  mv install.sql database.sql
+
   # Load database in to staging server
   stan db importstaging
 
@@ -125,7 +128,7 @@ elif [ "$METHOD" = "install" ]; then
   DBNAME=$( getConfigVar "DBNAME_STAGING" )
 
   # Truncate uploads and satmp tables
-  mysql --defaults-extra-file=database/staging.cnf $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
+  mysql --defaults-extra-file=database/staging.cnf $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE logs;'
 
   # Install node/bower/composer dependencies
   stan dependencies
