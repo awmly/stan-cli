@@ -14,7 +14,7 @@ elif [ "$METHOD" = "install" ]; then
   DBNAME=$( getConfigVar "DBNAME_STAGING" )
 
   # Truncate uploads and satmp tables
-  mysql --defaults-extra-file=database/staging.cnf $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE satmp;'
+  mysql --defaults-extra-file=database/staging.cnf $DBNAME --execute='TRUNCATE TABLE uploads;TRUNCATE TABLE logs;'
 
   # Install node/bower/composer dependencies
   stan dependencies
