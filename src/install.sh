@@ -4,6 +4,9 @@ elif [ "$METHOD" = "install" ]; then
   # Create mysql config files
   stan db conf
 
+  # Rename database so it can be imported
+  mv install.sql database.sql
+
   # Load database in to staging server
   stan db importstaging
 
