@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
-########### VERSION 1.0.4 ############
-######## DATE 09:02 - 19/05/15 #######
+########### VERSION 1.0.5 ############
+######## DATE 09:38 - 22/05/15 #######
 ######################################
 
 # Get passed arguments
@@ -220,6 +220,35 @@ elif [ "$METHOD" = "clone" ]; then
   echo $CLONE
   echo $CLONE2
   echo $HR
+
+# Define build method
+elif [ "$METHOD" = "build" ]; then
+
+  # Check bower dependencies are up to date
+  bower install
+
+  # Copy jQuery from bower components to project
+  mkdir -p httpdocs/assets/frontend/libs/jquery/ && cp bower_components/jquery/dist/jquery.min.js httpdocs/assets/frontend/libs/jquery/
+
+  # Copy font awesome from bower components to project
+  mkdir -p httpdocs/assets/frontend/libs/fontawesome/css/ && cp bower_components/fontawesome/css/font-awesome.min.css httpdocs/assets/frontend/libs/fontawesome/css/
+  mkdir -p httpdocs/assets/frontend/libs/fontawesome/fonts/ && cp bower_components/fontawesome/fonts/* httpdocs/assets/frontend/libs/fontawesome/fonts/
+  mkdir -p httpdocs/cache/fonts && cp bower_components/fontawesome/fonts/* httpdocs/cache/fonts
+
+  # Load grunt build task - this will build our css/js files
+  grunt build
+
+# Define dependencies method
+elif [ "$METHOD" = "dependencies" ]; then
+
+  # Install node modules
+  npm install
+
+  # Install bower components
+  bower install
+
+  # Install PHP classes
+  composer install
 
 # Define update method
 elif [ "$METHOD" = "update" ]; then

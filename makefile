@@ -1,5 +1,5 @@
 # Set some vars
-VERSION=1.0.4
+VERSION=1.0.5
 TICK=\033[32m✔\033[39m
 DATE=$(shell date +"%H:%M - %d/%m/%y")
 $NL="\r"
@@ -28,6 +28,10 @@ global:
 	@echo "${NL}" >> stan
 	@cat src/clone.sh >> stan
 	@echo "${NL}" >> stan
+	@cat src/build.sh >> stan
+	@echo "${NL}" >> stan
+	@cat src/dependencies.sh >> stan
+	@echo "${NL}" >> stan
 	@cat src/update.sh >> stan
 	@echo "${NL}" >> stan
 	@cat src/local.sh >> stan
@@ -51,10 +55,6 @@ local:
 	@cat src/functions.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
 	@cat src/upload.sh >> stan-cli
-	@echo "${NL}" >> stan-cli
-	@cat src/build.sh >> stan-cli
-	@echo "${NL}" >> stan-cli
-	@cat src/dependencies.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
 	@cat src/remove-sourcemaps.sh >> stan-cli
 	@echo "${NL}" >> stan-cli
