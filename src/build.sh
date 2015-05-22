@@ -13,4 +13,4 @@ elif [ "$METHOD" = "build" ]; then
   mkdir -p httpdocs/cache/fonts && cp bower_components/fontawesome/fonts/* httpdocs/cache/fonts
 
   # Load grunt build task - this will build our css/js files
-  grunt build
+  grunt build || grunt update

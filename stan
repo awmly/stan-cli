@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
-########### VERSION 1.0.5 ############
-######## DATE 09:38 - 22/05/15 #######
+########### VERSION 1.0.6 ############
+######## DATE 09:45 - 22/05/15 #######
 ######################################
 
 # Get passed arguments
@@ -205,9 +205,10 @@ elif [ "$METHOD" = "clone" ]; then
 
   # Set repo based on current dir
   REPO=${PWD##*/}
+  REPOOLD=$(echo "${PWD##*/}" | sed 's/\./-/g')
 
   # Clone repo in to current dir
-  git clone git@gitlab.com:smartarts/${REPO}.git .
+  git clone git@gitlab.com:smartarts/${REPO}.git . || git clone git@gitlab.com:smartarts/${REPOOLD}.git . 
 
   # Install node/bower/composer dependencies
   stan dependencies
@@ -236,7 +237,7 @@ elif [ "$METHOD" = "build" ]; then
   mkdir -p httpdocs/cache/fonts && cp bower_components/fontawesome/fonts/* httpdocs/cache/fonts
 
   # Load grunt build task - this will build our css/js files
-  grunt build
+  grunt build || grunt update
 
 # Define dependencies method
 elif [ "$METHOD" = "dependencies" ]; then
