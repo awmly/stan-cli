@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
-########### VERSION 1.0.6 ############
-######## DATE 09:45 - 22/05/15 #######
+########### VERSION 1.0.7 ############
+######## DATE 11:32 - 09/06/15 #######
 ######################################
 
 # Get passed arguments
@@ -119,7 +119,7 @@ elif [ "$METHOD" = "install" ]; then
   stan db conf
 
   # Rename database so it can be imported
-  mv install.sql database.sql
+  mv database/install.sql database/database.sql
 
   # Load database in to staging server
   stan db importstaging
