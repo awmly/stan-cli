@@ -5,7 +5,7 @@ elif [ "$METHOD" = "install" ]; then
   stan db conf
 
   # Rename database so it can be imported
-  mv install.sql database.sql
+  mv database/install.sql database/database.sql
 
   # Load database in to staging server
   stan db importstaging
