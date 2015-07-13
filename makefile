@@ -1,5 +1,5 @@
 # Set some vars
-VERSION=1.0.7
+VERSION=1.0.8
 TICK=\033[32m✔\033[39m
 DATE=$(shell date +"%H:%M - %d/%m/%y")
 $NL="\r"
