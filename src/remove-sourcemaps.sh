@@ -8,4 +8,4 @@ elif [ "$METHOD" = "remove-sourcemaps" ]; then
   sed -i '' 's/sourceMappingURL=.*\.map//g' httpdocs/cache/assets/${VHOST}-*.css
 
   # Remove js maps
-  sed -i '' 's/\/\/# sourceMappingURL=.*\.map//g' httpdocs/cache/assets/${VHOST}-*.js
+  sed -i '' 's/\/\/# sourceMappingURL=[^;]*//g' httpdocs/cache/assets/${VHOST}-*.js
