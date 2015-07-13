@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
-########### VERSION 1.0.7 ############
-######## DATE 11:32 - 09/06/15 #######
+########### VERSION 1.0.8 ############
+######## DATE 13:21 - 13/07/15 #######
 ######################################
 
 # Get passed arguments
@@ -169,7 +169,7 @@ elif [ "$METHOD" = "remove-sourcemaps" ]; then
   sed -i '' 's/sourceMappingURL=.*\.map//g' httpdocs/cache/assets/${VHOST}-*.css
 
   # Remove js maps
-  sed -i '' 's/\/\/# sourceMappingURL=.*\.map//g' httpdocs/cache/assets/${VHOST}-*.js
+  sed -i '' 's/\/\/# sourceMappingURL=[^;]*//g' httpdocs/cache/assets/${VHOST}-*.js
 
 # Define deploy method
 elif [ "$METHOD" = "deploy" ]; then
