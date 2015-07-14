@@ -46,7 +46,7 @@ if [ "$METHOD" = "upload" ]; then
     prompt "${UPLOADPROMPT} ${REMOTE}${REMOTE_PATH}"
 
     # Upload httpdocs
-    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
+    rsync -trp --omit-dir-times --delete --exclude=assets/libs/bower_components --exclude=cache/images --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
 
     # Upload cache images (without --delete flag)
     rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
