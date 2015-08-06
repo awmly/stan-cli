@@ -68,7 +68,7 @@ elif [ "$METHOD" = "db" ]; then
     DBNAME=$( getConfigVar "DBNAME" )
 
     # Run mysqldump command
-    mysqldump --defaults-extra-file=database/production.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
+    mysqldump --defaults-extra-file=database/production.cnf --complete-insert --default-character-set=utf8 $DBNAME ${ARGS[2]} > database/database.sql
 
     # Show complete text
     echo $HR
@@ -94,7 +94,7 @@ elif [ "$METHOD" = "db" ]; then
     DBNAME=$( getConfigVar "DBNAME_STAGING" )
 
     # Run mysqldump command
-    mysqldump --defaults-extra-file=database/staging.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
+    mysqldump --defaults-extra-file=database/staging.cnf --complete-insert --default-character-set=utf8 $DBNAME ${ARGS[2]} > database/database.sql
 
     # Show complete text
     echo $HR
@@ -120,7 +120,7 @@ elif [ "$METHOD" = "db" ]; then
     DBNAME=$( getConfigVar "DBNAME_LOCAL" )
 
     # Run mysqldump command
-    mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
+    mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME ${ARGS[2]} > database/database.sql
 
     # Show complete text
     echo $HR
