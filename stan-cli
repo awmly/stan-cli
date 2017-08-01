@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.9 ############
-######## DATE 09:49 - 14/07/15 #######
+######## DATE 12:19 - 01/08/17 #######
 ######################################
 
 # Get passed arguments
@@ -95,17 +95,37 @@ if [ "$METHOD" = "upload" ]; then
   # Get remote from config
   REMOTE=$( getConfigVar "REMOTE" )
 
+  # Get staging server config
+  STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
+
+  # Check which env to upload to
+  if [ "$STAGING_SERVER" = "1" ]; then
+
+    # Staging
+    REMOTE_PATH="staging/"
+
+  else
+
+    # Production
+    REMOTE_PATH="httpdocs/"
+
+  fi
+
   # If upload is scripts
   if [ "${ARGS[1]}" = "scripts" ]; then
 
     # Set permissions
-    chmod 0700 stan-cli scripts/*
+    chmod 0755 stan-cli scripts/*
 
     # Upload scripts
     rsync -trp --omit-dir-times --delete scripts/ ${REMOTE}scripts/
 
     # Upload stan-cli
     rsync -trp --omit-dir-times --delete stan-cli ${REMOTE}stan-cli
+
+  elif [ "${ARGS[1]}" = "cacheimages" ]; then
+
+    rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
 
   else
 
@@ -117,36 +137,26 @@ if [ "$METHOD" = "upload" ]; then
     # Remove source maps from minified files
     stan remove-sourcemaps
 
-    # Get staging server config
-    STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
-
-    # Check which env to upload to
-    if [ "$STAGING_SERVER" = "1" ]; then
-
-      # Staging
-      REMOTE_PATH="staging/"
-
-    else
-
-      # Production
-      REMOTE_PATH="httpdocs/"
-
-    fi
-
     # Show prompt
     prompt "${UPLOADPROMPT} ${REMOTE}${REMOTE_PATH}"
 
+    # Delete local params
+    rm httpdocs/cache/params/* 2> /dev/null
+
     # Upload httpdocs
-    rsync -trp --omit-dir-times --delete --exclude=assets/libs/bower_components --exclude=cache/images --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
+    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/media --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
 
     # Upload cache images (without --delete flag)
     rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
+    rsync -trp --omit-dir-times httpdocs/cache/media/ ${REMOTE}${REMOTE_PATH}cache/media/
 
     # Upload uploads
     rsync -trp --omit-dir-times uploads/ ${REMOTE}uploads/
 
     # Upload to CDN
-    grunt cloudfiles
+    if [ "${ARGS[1]}" != "code" ]; then
+      grunt cloudfiles
+    fi
 
     # Clear cache/uploads directories
     rm -f uploads/images/*
@@ -180,11 +190,15 @@ elif [ "$METHOD" = "deploy" ]; then
   # Create snapshot
   stan snapshot
 
+  # Clear cache
+  rm -rf staging/cache/views/*
+
   # Copy staging to production
-  rsync -trp --omit-dir-times --delete --exclude=cache/images staging/ httpdocs/
+  rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/media staging/ httpdocs/
 
   # Copy staging cache to production cache (without --delete flag)
   rsync -trp --omit-dir-times staging/cache/images/ httpdocs/cache/images/
+  rsync -trp --omit-dir-times staging/cache/media/ httpdocs/cache/media/
 
   # Export staging db
   stan db exportstaging
@@ -340,7 +354,7 @@ elif [ "$METHOD" = "db" ]; then
     DBNAME=$( getConfigVar "DBNAME" )
 
     # Run mysqldump command
-    mysqldump --defaults-extra-file=database/production.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
+    mysqldump --defaults-extra-file=database/production.cnf --complete-insert --default-character-set=utf8 $DBNAME ${ARGS[2]} > database/database.sql
 
     # Show complete text
     echo $HR
@@ -366,7 +380,7 @@ elif [ "$METHOD" = "db" ]; then
     DBNAME=$( getConfigVar "DBNAME_STAGING" )
 
     # Run mysqldump command
-    mysqldump --defaults-extra-file=database/staging.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
+    mysqldump --defaults-extra-file=database/staging.cnf --complete-insert --default-character-set=utf8 $DBNAME ${ARGS[2]} > database/database.sql
 
     # Show complete text
     echo $HR
@@ -392,7 +406,7 @@ elif [ "$METHOD" = "db" ]; then
     DBNAME=$( getConfigVar "DBNAME_LOCAL" )
 
     # Run mysqldump command
-    mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME > database/database.sql
+    mysqldump --defaults-extra-file=database/local.cnf --complete-insert --default-character-set=utf8 $DBNAME ${ARGS[2]} > database/database.sql
 
     # Show complete text
     echo $HR
@@ -425,9 +439,10 @@ elif [ "$METHOD" = "speedtest" ]; then
 
   # Get SIET_URL from config file
   SITE_URL=$( getConfigVar "SITE_URL" )
+  API_KEY=$( getConfigVar "GOOGLE_API_KEY" )
 
   # Run sitespeed.io test
-  sitespeed.io -u $SITE_URL -r tests/sitespeed.io/ -j 20 -s /contact-us
+  sitespeed.io -u $SITE_URL -r tests/sitespeed.io/ -j 20 -s /contact-us --gpsiKey API_KEY
 
   # Run GT Metrix (Page speed and Y Slow)
   php tests/gtmetrix/run-test.php
@@ -488,6 +503,9 @@ elif [ "$METHOD" = "" ]; then
   # Rebase from remote
   stan rebase
 
+  # Install node/bower/composer dependencies
+  stan dependencies
+
   # Build JS/CSS libraries
   stan build
 
@@ -497,11 +515,14 @@ elif [ "$METHOD" = "" ]; then
   # Start mysql server
   mysql.server start
 
+  # Make sure local db is clean
+  mysql --defaults-extra-file=database/local.cnf --execute='drop database stan;create database stan;'
+
   # Export current remote db and load it in to local server
   stan db synclocal
 
   # Open frontend and backend in Chrome as background tasks
-  sleep 1 && open -a 'Google Chrome' http://stan:4000/stan/ &
+  sleep 1 && open -a 'Google Chrome' http://stan:4000/base/ &
   sleep 2 && open -a 'Google Chrome' http://stan:4000/ &
 
   # Start grunt server

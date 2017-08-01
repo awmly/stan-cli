@@ -12,7 +12,7 @@ if [ "$METHOD" = "init" ]; then
 
   # Set repo based on directory name and add
   REPO=${PWD##*/}
-  git remote add origin git@gitlab.com:smartarts/${REPO}.git
+  git remote add origin git@gitlab.com:applieddigital/${REPO}.git
 
   # Open atom
   atom ./

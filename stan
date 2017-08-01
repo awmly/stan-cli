@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
 ########### VERSION 1.0.9 ############
-######## DATE 09:49 - 14/07/15 #######
+######## DATE 12:19 - 01/08/17 #######
 ######################################
 
 # Get passed arguments
@@ -101,7 +101,7 @@ if [ "$METHOD" = "init" ]; then
 
   # Set repo based on directory name and add
   REPO=${PWD##*/}
-  git remote add origin git@gitlab.com:smartarts/${REPO}.git
+  git remote add origin git@gitlab.com:applieddigital/${REPO}.git
 
   # Open atom
   atom ./
@@ -208,7 +208,7 @@ elif [ "$METHOD" = "clone" ]; then
   REPOOLD=$(echo "${PWD##*/}" | sed 's/\./-/g')
 
   # Clone repo in to current dir
-  git clone git@gitlab.com:smartarts/${REPO}.git . || git clone git@gitlab.com:smartarts/${REPOOLD}.git . 
+  git clone git@gitlab.com:applieddigital/${REPO}.git . || git@gitlab.com:smartarts/${REPO}.git . || git clone git@gitlab.com:smartarts/${REPOOLD}.git . 
 
   # Install node/bower/composer dependencies
   stan dependencies
