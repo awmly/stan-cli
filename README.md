@@ -1,4 +1,4 @@
-# STAN CLI  [![Build Status](https://travis-ci.org/awomersley/stan-cli.svg?branch=master)](https://travis-ci.org/awomersley/stan-cli)
+# STAN CLI  [![Build Status](https://travis-ci.org/awmly/stan-cli.svg?branch=master)](https://travis-ci.org/awomersley/stan-cli)
 
 STAN CLI is a command line interface for development on STAN admin. STAN CLI is split in to two shell scripts; a global app which will handle the core functionality inititialisaton, install, clone etc. This should live in a dir listed in the export path - eg `/usr/bin/stan`.
 
@@ -8,7 +8,7 @@ The second script is an app to be included locally within each project and will 
 Run the following commands as root/sudo to install the global stan application. Once the global app is installed you will be able to run commands to install a new project or clone an existing project which will install the local app.
 
 ```shell
-wget https://raw.githubusercontent.com/awomersley/stan-cli/master/stan -O /usr/local/bin/stan
+wget https://raw.githubusercontent.com/awmly/stan-cli/master/stan -O /usr/local/bin/stan
 chmod +x /usr/local/bin/stan
 ```
 
