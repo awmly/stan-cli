@@ -12,7 +12,19 @@ elif [ "$METHOD" = "clone" ]; then
   REPOOLD=$(echo "${PWD##*/}" | sed 's/\./-/g')
 
   # Clone repo in to current dir
-  git clone git@gitlab.com:applieddigital/${REPO}.git . || git@gitlab.com:smartarts/${REPO}.git . || git clone git@gitlab.com:smartarts/${REPOOLD}.git . 
+  if [[ "$(git ls-remote git@gitlab.com:applieddigital/${REPO}.git 2> /dev/null)" == *"HEAD"* ]]; then
+
+    git clone git@gitlab.com:applieddigital/${REPO}.git .
+
+  elif [[ "$(git ls-remote git@gitlab.com:smartarts/${REPO}.git 2> /dev/null)" == *"HEAD"* ]]; then
+
+    git clone git@gitlab.com:smartarts/${REPO}.git .
+
+  elif [[ "$(git ls-remote git@gitlab.com:smartarts/${REPOOLD}.git 2> /dev/null)" == *"HEAD"* ]]; then
+
+    git clone git@gitlab.com:smartarts/${REPOOLD}.git .
+
+  fi
 
   # Install node/bower/composer dependencies
   stan dependencies
