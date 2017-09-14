@@ -51,10 +51,11 @@ if [ "$METHOD" = "upload" ]; then
 
     # Delete local params
     rm httpdocs/cache/params/* 2> /dev/null
+    rm httpdocs/cache/tmp/* 2> /dev/null
 
     # Upload httpdocs
-    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/media --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
-
+    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/media httpdocs/ ${REMOTE}${REMOTE_PATH}
+    
     # Upload cache images (without --delete flag)
     rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
     rsync -trp --omit-dir-times httpdocs/cache/media/ ${REMOTE}${REMOTE_PATH}cache/media/
