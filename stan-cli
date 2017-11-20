@@ -4,7 +4,7 @@
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
 ########### VERSION 1.0.9 ############
-######## DATE 07:50 - 14/09/17 #######
+######## DATE 15:05 - 20/11/17 #######
 ######################################
 
 # Get passed arguments
@@ -507,9 +507,6 @@ elif [ "$METHOD" = "" ]; then
   # Install node/bower/composer dependencies
   stan dependencies
 
-  # Build JS/CSS libraries
-  stan build
-
   # Open atom
   atom ./
 
@@ -521,6 +518,9 @@ elif [ "$METHOD" = "" ]; then
 
   # Export current remote db and load it in to local server
   stan db synclocal
+
+  # Build JS/CSS libraries
+  stan build
 
   # Open frontend and backend in Chrome as background tasks
   sleep 1 && open -a 'Google Chrome' http://stan:4000/base/ &

@@ -7,9 +7,6 @@ elif [ "$METHOD" = "" ]; then
   # Install node/bower/composer dependencies
   stan dependencies
 
-  # Build JS/CSS libraries
-  stan build
-
   # Open atom
   atom ./
 
@@ -21,6 +18,9 @@ elif [ "$METHOD" = "" ]; then
 
   # Export current remote db and load it in to local server
   stan db synclocal
+
+  # Build JS/CSS libraries
+  stan build
 
   # Open frontend and backend in Chrome as background tasks
   sleep 1 && open -a 'Google Chrome' http://stan:4000/base/ &
