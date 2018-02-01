@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############# LOCAL BIN ##############
-########### VERSION 1.0.9 ############
-######## DATE 15:05 - 20/11/17 #######
+########### VERSION 1.1.0 ############
+######## DATE 15:13 - 01/02/18 #######
 ######################################
 
 # Get passed arguments
@@ -127,6 +127,11 @@ if [ "$METHOD" = "upload" ]; then
 
     rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
 
+  elif [ "${ARGS[1]}" = "cache" ]; then
+
+    rsync -trp --omit-dir-times httpdocs/cache/ ${REMOTE}${REMOTE_PATH}cache/
+    grunt cloudfiles:cache
+
   else
 
     # Set folder permissions
@@ -145,9 +150,10 @@ if [ "$METHOD" = "upload" ]; then
     rm httpdocs/cache/tmp/* 2> /dev/null
 
     # Upload httpdocs
-    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/media httpdocs/ ${REMOTE}${REMOTE_PATH}
-    
+    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/libs --exclude=cache/media --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
+
     # Upload cache images (without --delete flag)
+    rsync -trp --omit-dir-times httpdocs/cache/tmp/ ${REMOTE}${REMOTE_PATH}cache/tmp/
     rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
     rsync -trp --omit-dir-times httpdocs/cache/media/ ${REMOTE}${REMOTE_PATH}cache/media/
 
@@ -156,7 +162,7 @@ if [ "$METHOD" = "upload" ]; then
 
     # Upload to CDN
     if [ "${ARGS[1]}" != "code" ]; then
-      grunt cloudfiles
+      grunt cloudfiles:prod
     fi
 
     # Clear cache/uploads directories
@@ -349,6 +355,27 @@ elif [ "$METHOD" = "db" ]; then
     # Import in to local
     stan db importlocal
 
+  elif [ "${ARGS[1]}" = "pushlocal" ]; then
+
+    # Export local
+    stan db exportlocal
+
+    # Get staging server value
+    STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
+
+    # If staging server is active
+    if [ "$STAGING_SERVER" = "1" ]; then
+
+      # Import staging
+      stan db importstaging
+
+    else
+
+      # Import production
+      stan db importproduction
+
+    fi
+
   elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
     # Get database name
@@ -458,7 +485,7 @@ elif [ "$METHOD" = "rebase" ]; then
   if [[ $GIT_STATUS == *"nothing to commit"* ]]; then
 
     # Rebase master
-    git pull --rebase -p origin master
+    git pull --rebase
 
   else
 
@@ -469,7 +496,7 @@ elif [ "$METHOD" = "rebase" ]; then
     git stash
 
     # Rebase master
-    git pull --rebase -p origin master
+    git pull --rebase
 
     # Unstash files
     git stash apply

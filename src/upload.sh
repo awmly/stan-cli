@@ -36,6 +36,11 @@ if [ "$METHOD" = "upload" ]; then
 
     rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
 
+  elif [ "${ARGS[1]}" = "cache" ]; then
+
+    rsync -trp --omit-dir-times httpdocs/cache/ ${REMOTE}${REMOTE_PATH}cache/
+    grunt cloudfiles:cache
+
   else
 
     # Set folder permissions
@@ -54,9 +59,10 @@ if [ "$METHOD" = "upload" ]; then
     rm httpdocs/cache/tmp/* 2> /dev/null
 
     # Upload httpdocs
-    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/media --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
+    rsync -trp --omit-dir-times --delete --exclude=cache/images --exclude=cache/libs --exclude=cache/media --exclude=cache/tmp httpdocs/ ${REMOTE}${REMOTE_PATH}
 
     # Upload cache images (without --delete flag)
+    rsync -trp --omit-dir-times httpdocs/cache/tmp/ ${REMOTE}${REMOTE_PATH}cache/tmp/
     rsync -trp --omit-dir-times httpdocs/cache/images/ ${REMOTE}${REMOTE_PATH}cache/images/
     rsync -trp --omit-dir-times httpdocs/cache/media/ ${REMOTE}${REMOTE_PATH}cache/media/
 
@@ -65,7 +71,7 @@ if [ "$METHOD" = "upload" ]; then
 
     # Upload to CDN
     if [ "${ARGS[1]}" != "code" ]; then
-      grunt cloudfiles
+      grunt cloudfiles:prod
     fi
 
     # Clear cache/uploads directories

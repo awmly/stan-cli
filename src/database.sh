@@ -62,6 +62,27 @@ elif [ "$METHOD" = "db" ]; then
     # Import in to local
     stan db importlocal
 
+  elif [ "${ARGS[1]}" = "pushlocal" ]; then
+
+    # Export local
+    stan db exportlocal
+
+    # Get staging server value
+    STAGING_SERVER=$( getConfigVar "STAGING_SERVER" )
+
+    # If staging server is active
+    if [ "$STAGING_SERVER" = "1" ]; then
+
+      # Import staging
+      stan db importstaging
+
+    else
+
+      # Import production
+      stan db importproduction
+
+    fi
+
   elif [ "${ARGS[1]}" = "exportproduction" ]; then
 
     # Get database name

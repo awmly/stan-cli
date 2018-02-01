@@ -3,8 +3,8 @@
 ######################################
 #### STAN Command Line Interface #####
 ############ GLOBAL BIN ##############
-########### VERSION 1.0.9 ############
-######## DATE 15:05 - 20/11/17 #######
+########### VERSION 1.1.0 ############
+######## DATE 15:13 - 01/02/18 #######
 ######################################
 
 # Get passed arguments
@@ -144,6 +144,7 @@ elif [ "$METHOD" = "install" ]; then
   # Upload to server
   stan upload
   stan upload scripts
+  stan upload cache
 
   # Show complete text
   echo $HR

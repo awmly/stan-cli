@@ -8,7 +8,7 @@ elif [ "$METHOD" = "rebase" ]; then
   if [[ $GIT_STATUS == *"nothing to commit"* ]]; then
 
     # Rebase master
-    git pull --rebase -p origin master
+    git pull --rebase
 
   else
 
@@ -19,7 +19,7 @@ elif [ "$METHOD" = "rebase" ]; then
     git stash
 
     # Rebase master
-    git pull --rebase -p origin master
+    git pull --rebase
 
     # Unstash files
     git stash apply
